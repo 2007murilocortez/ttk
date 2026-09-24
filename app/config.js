@@ -3,9 +3,9 @@ window.DECLIC_CONFIG = {
   preview: true,
   supportEmail: 'support@plancreateur.online',
   // Preencher antes de submeter na Digistore24:
-  publisherName: 'Plan Créateur',
-  publisherAddress: 'France',
-  publisherPhone: '+33 1 88 99 27 66',
+  publisherName: 'Murilo Cortez',
+  publisherAddress: 'Av. Brig. Faria Lima, 1581, Pinheiros, São Paulo - SP, 01451-001, Brésil',
+  publisherPhone: '+55 15 99650-0686',
   publisherRegistration: '',
   privacyContact: 'support@plancreateur.online',
   refundDays: 14,
