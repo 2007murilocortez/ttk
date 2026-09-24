@@ -1220,11 +1220,10 @@
                             } catch(e) {}
 
                             if (window.ttPixel) {
-                                ttPixel.identify({
+                                ttPixel.initiateCheckout({
                                     email: customerEmail,
                                     phone: customerPhone
                                 });
-                                ttPixel.initiateCheckout();
                             }
 
                             openCheckoutModal();

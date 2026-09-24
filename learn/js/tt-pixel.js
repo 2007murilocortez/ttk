@@ -38,6 +38,15 @@
     return /^\+[1-9]\d{7,14}$/.test(phone);
   }
 
+  function isPlausibleFrenchMobile(phone) {
+    if (!/^\+33[67]\d{8}$/.test(phone)) return false;
+    var local = phone.slice(3);
+    if (/^(\d)\1+$/.test(local)) return false;
+    if (/0{5,}/.test(local)) return false;
+    if (local === "600000000" || local === "700000000") return false;
+    return true;
+  }
+
   // Funil FR: telefone Wero em E.164 (+33XXXXXXXXX).
   function normalizePhone(phone) {
     var raw = String(phone || "").trim();
@@ -73,7 +82,9 @@
     var phone = normalizePhone(src.phone || buyer.chaveWero || buyer.chaveBizum);
     var pii = {};
     if (email) pii.email = email;
-    if (phone && isValidE164(phone)) pii.phone_number = phone;
+    if (phone && isValidE164(phone) && isPlausibleFrenchMobile(phone)) {
+      pii.phone_number = phone;
+    }
     if (email) pii.external_id = email;
     if (Object.keys(pii).length) ttq.identify(pii);
   }
@@ -83,9 +94,9 @@
     ttq.track("ViewContent", productPayload());
   }
 
-  function initiateCheckout() {
+  function initiateCheckout(overrides) {
     if (!window.ttq) return;
-    identify();
+    identify(overrides);
     ttq.track("InitiateCheckout", productPayload());
   }
 
