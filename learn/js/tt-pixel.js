@@ -156,15 +156,16 @@
     if (hasPaymentFired(proof, dedupeKey)) return false;
 
     var eventId = proof
-      ? "CompletePayment:" + String(proof)
-      : "CompletePayment:736912:" + (email || Date.now().toString(36));
+      ? "Purchase:" + String(proof)
+      : "Purchase:736912:" + (email || Date.now().toString(36));
 
     identify({
       email: email,
       phone: options.phone || buyer.chaveWero || buyer.chaveBizum,
     });
 
-    ttq.track("CompletePayment", productPayload(), { event_id: eventId });
+    // TikTok funnel configurado como "Purchase" (equivale a CompletePayment).
+    ttq.track("Purchase", productPayload(), { event_id: eventId });
     markPaymentFired(proof, dedupeKey);
     return true;
   }
