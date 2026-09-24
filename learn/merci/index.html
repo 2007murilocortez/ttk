@@ -62,22 +62,37 @@
   <script>
     (function () {
       var qs = new URLSearchParams(window.location.search || "");
+      function resolveEmail() {
+        var fromUrl = qs.get("buyer_email") || qs.get("email") || "";
+        if (fromUrl && fromUrl.indexOf("[") === -1 && fromUrl.indexOf("]") === -1) {
+          return fromUrl;
+        }
+        try {
+          var buyer = JSON.parse(localStorage.getItem("userWeroData") || "null");
+          if (buyer && buyer.email) return buyer.email;
+        } catch (e) {}
+        return "";
+      }
+
       var orderId = qs.get("order_id") || qs.get("order_item_id") || "";
-      var email = qs.get("buyer_email") || qs.get("email") || "";
+      var email = resolveEmail();
 
       function goNext() {
         var next = "/learn/up1.2/";
         var params = new URLSearchParams(window.location.search || "");
         params.delete("funnel");
+        params.delete("sha_sign");
         var q = params.toString();
         window.location.replace(next + (q ? "?" + q : ""));
       }
 
       function run() {
+        var fired = false;
         if (window.ttPixel && typeof window.ttPixel.completePayment === "function") {
-          window.ttPixel.completePayment({ proof: orderId, email: email });
+          fired = window.ttPixel.completePayment({ proof: orderId, email: email });
         }
-        setTimeout(goNext, 1500);
+        // Aguarda o pixel enviar antes de redirecionar (DS24 redirect é muito rápido).
+        setTimeout(goNext, fired ? 3500 : 1500);
       }
 
       if (window.ttq && typeof window.ttq.ready === "function") {

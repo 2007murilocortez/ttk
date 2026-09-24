@@ -74,11 +74,19 @@
     return "";
   }
 
+  function sanitizeEmail(raw) {
+    var email = String(raw || "").trim().toLowerCase();
+    if (!email) return "";
+    if (email.indexOf("[") !== -1 || email.indexOf("]") !== -1) return "";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "";
+    return email;
+  }
+
   function identify(overrides) {
     if (!window.ttq) return;
     var buyer = readBuyer() || {};
     var src = overrides || {};
-    var email = (src.email || buyer.email || "").trim().toLowerCase();
+    var email = sanitizeEmail(src.email || buyer.email);
     var phone = normalizePhone(src.phone || buyer.chaveWero || buyer.chaveBizum);
     var pii = {};
     if (email) pii.email = email;
@@ -131,20 +139,24 @@
       qs.get("order_item_id") ||
       qs.get("payment_id") ||
       "";
-    var email =
-      (options.email || qs.get("buyer_email") || qs.get("email") || buyer.email || "")
-        .trim()
-        .toLowerCase();
+    var email = sanitizeEmail(
+      options.email ||
+        qs.get("buyer_email") ||
+        qs.get("email") ||
+        buyer.email
+    );
     var pending = false;
     try {
       pending = sessionStorage.getItem("ttk:ds24_pending") === "1";
     } catch (e) {}
 
     if (!proof && !email && !pending) return false;
-    if (hasPaymentFired(proof, email)) return false;
+
+    var dedupeKey = proof || email || "pending";
+    if (hasPaymentFired(proof, dedupeKey)) return false;
 
     var eventId = proof
-      ? String(proof)
+      ? "CompletePayment:" + String(proof)
       : "CompletePayment:736912:" + (email || Date.now().toString(36));
 
     identify({
@@ -153,7 +165,7 @@
     });
 
     ttq.track("CompletePayment", productPayload(), { event_id: eventId });
-    markPaymentFired(proof, email);
+    markPaymentFired(proof, dedupeKey);
     return true;
   }
 
