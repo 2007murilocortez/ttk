@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
-  <title>Redirection…</title>
+  <title>Paiement confirmé</title>
   <script src="/js/ds24-thankyou.js"></script>
   <script src="/learn/js/learn-config.js"></script>
   <style>
@@ -14,17 +14,42 @@
       display: grid;
       place-items: center;
       font-family: system-ui, sans-serif;
-      color: #444;
+      color: #222;
+      padding: 24px;
     }
+    .card {
+      max-width: 480px;
+      text-align: center;
+      line-height: 1.55;
+    }
+    h1 { font-size: 22px; margin: 0 0 12px; }
+    p { color: #555; margin: 0 0 16px; }
+    a.btn {
+      display: inline-block;
+      padding: 12px 20px;
+      background: #0c0c14;
+      color: #9be8d3;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    .fine { font-size: 13px; color: #777; margin-top: 20px; }
   </style>
 </head>
 <body>
-  <p>Redirection en cours…</p>
+  <div class="card">
+    <h1>Paiement confirmé</h1>
+    <p id="obrigado-msg">Votre commande a été enregistrée. Accédez à votre PDF via Digistore24.</p>
+    <p><a class="btn" id="obrigado-continue" href="/app/merci/">Accéder à mon produit PDF</a></p>
+    <p class="fine">Vous recevrez aussi un e-mail Digistore24 avec le lien de téléchargement. Vérifiez vos spams.</p>
+  </div>
   <script>
     (function () {
       var qs = window.location.search || "";
       var params = new URLSearchParams(qs);
       var cfg = window.LEARN_CONFIG || { pages: {} };
+      var step = params.get("step") || "";
+      var continueEl = document.getElementById("obrigado-continue");
 
       function isLearnFunnel() {
         if (params.get("funnel") === "learn") return true;
@@ -41,34 +66,35 @@
         up3: cfg.pages && cfg.pages.final,
       };
 
-      var appNext = {
-        up1: "/app/up2/",
-        up2: "/app/up3/",
-        up3: "/app/merci/",
-      };
-
-      function cleanQuery() {
-        var next = new URLSearchParams(qs);
-        next.delete("funnel");
-        next.delete("step");
-        next.delete("sha_sign");
-        var q = next.toString();
-        return q ? "?" + q : "";
+      function buildRedirect(path) {
+        var url = new URL(path, window.location.origin);
+        var extra = new URLSearchParams(qs);
+        extra.delete("funnel");
+        extra.delete("sha_sign");
+        extra.forEach(function (value, key) {
+          if (value && !url.searchParams.has(key)) {
+            url.searchParams.set(key, value);
+          }
+        });
+        return url.pathname + url.search + url.hash;
       }
 
       function redirect() {
         var learn = isLearnFunnel();
-        var step = params.get("step") || "";
-        var nextMap = learn ? learnNext : appNext;
-        var next = step && nextMap[step];
 
         try {
           sessionStorage.removeItem("ttk:funnel");
         } catch (e) {}
 
-        if (next) {
-          window.location.replace(next + cleanQuery());
-          return;
+        if (step) {
+          if (learn && learnNext[step]) {
+            window.location.replace(buildRedirect(learnNext[step]));
+            return;
+          }
+          if (!learn) {
+            window.location.replace(buildRedirect("/app/merci/?step=" + step));
+            return;
+          }
         }
 
         if (learn) {
@@ -76,11 +102,18 @@
           return;
         }
 
-        window.location.replace("/app/merci/" + qs);
+        window.location.replace(buildRedirect("/app/merci/"));
       }
 
-      // DS24 thank-you pixel precisa carregar nesta URL antes do redirect.
-      setTimeout(redirect, 1200);
+      if (step && !isLearnFunnel()) {
+        continueEl.href = buildRedirect("/app/merci/?step=" + step);
+        continueEl.textContent = "Accéder à mon PDF — étape suivante";
+      } else if (step && isLearnFunnel() && learnNext[step]) {
+        continueEl.href = buildRedirect(learnNext[step]);
+        continueEl.textContent = "Continuer";
+      }
+
+      setTimeout(redirect, 2800);
     })();
   </script>
 </body>
