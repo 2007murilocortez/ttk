@@ -3,9 +3,9 @@ window.LEARN_CONFIG = {
     // Front — produto 736912 (€27)
     front: "https://www.checkout-ds24.com/product/736912/",
     // Upsells: colar checkout URL de cada produto DS24 (ver comentários abaixo)
-    up1: "https://www.checkout-ds24.com/product/737299/",
-    up2: "",
-    up3: "",
+    up1: "https://www.checkout-ds24.com/product/737209/",
+    up2: "https://www.checkout-ds24.com/product/737213/",
+    up3: "https://www.checkout-ds24.com/product/737218/",
   },
   prices: {
     front: 27,

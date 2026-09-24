@@ -19,21 +19,21 @@ window.DECLIC_CONFIG = {
     },
     up1: {
       price: 19.9,
-      buyUrl: 'https://www.checkout-ds24.com/product/737299/',
+      buyUrl: 'https://www.checkout-ds24.com/product/737209/',
       thankYouUrl: 'https://www.plancreateur.online/obrigado/?step=up1',
       noUrl: 'https://www.plancreateur.online/app/up2/',
       integrationScript: ''
     },
     up2: {
       price: 25.58,
-      buyUrl: '',
+      buyUrl: 'https://www.checkout-ds24.com/product/737213/',
       thankYouUrl: 'https://www.plancreateur.online/obrigado/?step=up2',
       noUrl: 'https://www.plancreateur.online/app/up3/',
       integrationScript: ''
     },
     up3: {
       price: 33.77,
-      buyUrl: '',
+      buyUrl: 'https://www.checkout-ds24.com/product/737218/',
       thankYouUrl: 'https://www.plancreateur.online/obrigado/?step=up3',
       noUrl: 'https://www.plancreateur.online/app/merci/',
       integrationScript: ''
