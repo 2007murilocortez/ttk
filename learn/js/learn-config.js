@@ -28,16 +28,12 @@ window.LEARN_CONFIG = {
    *   Thank you URL: https://www.plancreateur.online/obrigado/
    *   (sem step → /learn/merci/ + Purchase TikTok)
    *
-   * UP1 (criar produto ~€19,90)
+   * UP1 (~€19,90)
    *   Thank you URL: https://www.plancreateur.online/obrigado/?step=up1
-   *   → redireciona para /learn/up2.2/
+   *   DS24/revisão → /app/up2/ | funil black → /learn/up2.2/
    *
-   * UP2 (~€25,58)
-   *   Thank you URL: https://www.plancreateur.online/obrigado/?step=up2
-   *   → /learn/up3.2/
-   *
-   * UP3 (~€33,77)
-   *   Thank you URL: https://www.plancreateur.online/obrigado/?step=up3
-   *   → /learn/final/
+   * UP2 (~€25,58) — obrigado/?step=up2 → /app/up3/ ou /learn/up3.2/
+   * UP3 (~€33,77) — obrigado/?step=up3 → /app/merci/ ou /learn/final/
+   * (black detectado via sessionStorage ttk:funnel=learn ou ttk:ds24_pending)
    */
 };

@@ -45,6 +45,9 @@
         buyBtn.href = appendTracking(buyUrl);
         buyBtn.addEventListener("click", function (e) {
           e.preventDefault();
+          try {
+            sessionStorage.setItem("ttk:funnel", "learn");
+          } catch (err) {}
           window.location.href = buyBtn.href;
         });
       } else {

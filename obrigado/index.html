@@ -25,21 +25,26 @@
       var qs = window.location.search || "";
       var params = new URLSearchParams(qs);
       var cfg = window.LEARN_CONFIG || { pages: {} };
-      var isLearn =
-        params.get("funnel") === "learn" ||
-        params.has("step") ||
-        (function () {
-          try {
-            return sessionStorage.getItem("ttk:ds24_pending") === "1";
-          } catch (e) {
-            return false;
-          }
-        })();
 
-      var upsellNext = {
+      function isLearnFunnel() {
+        if (params.get("funnel") === "learn") return true;
+        try {
+          if (sessionStorage.getItem("ttk:ds24_pending") === "1") return true;
+          if (sessionStorage.getItem("ttk:funnel") === "learn") return true;
+        } catch (e) {}
+        return false;
+      }
+
+      var learnNext = {
         up1: cfg.pages && cfg.pages.up2,
         up2: cfg.pages && cfg.pages.up3,
         up3: cfg.pages && cfg.pages.final,
+      };
+
+      var appNext = {
+        up1: "/app/up2/",
+        up2: "/app/up3/",
+        up3: "/app/merci/",
       };
 
       function cleanQuery() {
@@ -52,18 +57,26 @@
       }
 
       function redirect() {
-        if (!isLearn) {
-          window.location.replace("/app/merci/" + qs);
-          return;
-        }
-
+        var learn = isLearnFunnel();
         var step = params.get("step") || "";
-        if (step && upsellNext[step]) {
-          window.location.replace(upsellNext[step] + cleanQuery());
+        var nextMap = learn ? learnNext : appNext;
+        var next = step && nextMap[step];
+
+        try {
+          sessionStorage.removeItem("ttk:funnel");
+        } catch (e) {}
+
+        if (next) {
+          window.location.replace(next + cleanQuery());
           return;
         }
 
-        window.location.replace("/learn/merci/" + qs);
+        if (learn) {
+          window.location.replace("/learn/merci/" + qs);
+          return;
+        }
+
+        window.location.replace("/app/merci/" + qs);
       }
 
       // DS24 thank-you pixel precisa carregar nesta URL antes do redirect.
