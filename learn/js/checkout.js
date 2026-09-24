@@ -1,7 +1,11 @@
 (function () {
   "use strict";
 
-  var CHECKOUT_URL = "https://www.checkout-ds24.com/product/736912/";
+  var CHECKOUT_URL =
+    (window.LEARN_CONFIG &&
+      window.LEARN_CONFIG.ds24 &&
+      window.LEARN_CONFIG.ds24.front) ||
+    "https://www.checkout-ds24.com/product/736912/";
   var UTM_FIELDS = [
     "utm_source",
     "utm_medium",

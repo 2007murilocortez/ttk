@@ -328,38 +328,16 @@
       <h3 class="cta-title">Voulez-vous le recevoir aujourd’hui ?</h3>
       <p class="cta-sub">Confirmez maintenant pour activer immédiatement votre bonus.</p>
 
-      <!-- NOUVEAU WIDGET COOUD FLOW INTÉGRÉ EXCLUSIVEMENT POUR L’UPSELL 3 -->
-      <!-- =====================================================================
-      🔎 CTRL+F: [TROCAR-ONECLICK-UPSELL-03] — DÉBUT DU SCRIPT À REMPLACER
-      Lors du prochain remplacement, remplacez uniquement le contenu entre les marqueurs DÉBUT et FIN.
-      Ces commentaires ne modifient ni l’apparence ni le fonctionnement de la page.
-      ===================================================================== -->
-<div style="display:flex;flex-direction:column;gap:12px;width:fit-content;font-family:inherit;" data-cooud-flow-root>
-  <script type="application/json">{"steps":[{"title":"UP 3 UN","priceText":"33,77 €","primary":{"id":"01KYQBBXWJM8G2VJY9NJWASFCX","redirect":"https://www.plancreateur.online/learn/up3.2/","label":"OUI, JE LE VEUX","style":"display: flex; align-items: center; justify-content: center; text-decoration: none; font-family: inherit; font-weight: 600; padding: 12px 20px; font-size: 15px; border-radius: 8px; background-color: #098b1f; color: #ffffff; border: none; width: 100%; cursor: pointer;"},"fallback":null,"dismiss":{"primary":{"label":"ㅤ","style":"display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-family: inherit; font-weight: 400; padding: 8px 16px; font-size: 14px; border-radius: 8px; background-color: #ffffff; color: #ffffff; border: none;  cursor: pointer;"},"fallback":{"label":"ㅤ","style":"display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-family: inherit; font-weight: 400; padding: 8px 16px; font-size: 14px; border-radius: 8px; background-color: #ffffff; color: #ffffff; border: none;  cursor: pointer;"}}}],"initialStep":0,"startInFallback":false,"routingMode":"fallback","processingText":"Processando...","noMoreOffersText":"Obrigado! Sem mais ofertas.","connectScriptUrl":"https://orbit.cooud.com/scripts/connect"}</script>
-  <button
-    type="button"
-    data-cooud-flow-primary
-    data-connect-action="take"
-    data-connect-id="01KYQBBXWJM8G2VJY9NJWASFCX"
-    data-connect-redirect="https://www.plancreateur.online/learn/up3.2/"
-    style="display: flex; align-items: center; justify-content: center; text-decoration: none; font-family: inherit; font-weight: 600; padding: 12px 20px; font-size: 15px; border-radius: 8px; background-color: #098b1f; color: #ffffff; border: none; width: 100%; cursor: pointer;"
-  >
-    OUI, JE LE VEUX
-  </button>
-  <button
-    type="button"
-    data-cooud-flow-dismiss
-    data-connect-action="dismiss"
-    style="display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-family: inherit; font-weight: 400; padding: 8px 16px; font-size: 14px; border-radius: 8px; background-color: #ffffff; color: #ffffff; border: none;  cursor: pointer;"
-  >
-    ㅤ
-  </button>
-</div>
-<script src="https://js.stripe.com/v3/" async defer></script>
-<script src="https://orbit.cooud.com/scripts/flow" async defer></script>
-      <!-- =====================================================================
-      🔎 CTRL+F: [TROCAR-ONECLICK-UPSELL-03] — FIN DU SCRIPT À REMPLACER
-      ===================================================================== -->
+      <div data-ds24-upsell-root data-step="up3" style="display:flex;flex-direction:column;gap:12px;width:100%;font-family:inherit;">
+        <a href="#" data-ds24-buy style="display:flex;align-items:center;justify-content:center;text-decoration:none;font-family:inherit;font-weight:600;padding:12px 20px;font-size:15px;border-radius:8px;background-color:#098b1f;color:#ffffff;border:none;width:100%;cursor:pointer;">
+          OUI, JE LE VEUX — 33,77 €
+        </a>
+        <button type="button" data-ds24-skip style="display:inline-flex;align-items:center;justify-content:center;font-family:inherit;font-weight:400;padding:8px 16px;font-size:14px;border-radius:8px;background:transparent;color:#6b7280;border:none;cursor:pointer;">
+          Non merci, terminer
+        </button>
+      </div>
+      <script src="/learn/js/learn-config.js"></script>
+      <script src="/learn/js/ds24-upsell.js"></script>
 
       <p class="secure">
         <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
@@ -370,11 +348,6 @@
     <p class="footer">Processus 100 % sécurisé · Protocole TT-2026-TIJ5AM</p>
 
   </div>
-
-<!-- Scripts unifiés obligatoires Cooud -->
-<script src="cooud-upsell.js"></script>
-<script src="https://js.stripe.com/v3/" async defer></script>
-<script src="https://orbit.cooud.com/scripts/flow" async defer></script>
 
 <!-- Scripts de suivi (Utmify) -->
 <script>
