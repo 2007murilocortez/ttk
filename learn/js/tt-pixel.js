@@ -100,10 +100,69 @@
     ttq.track("InitiateCheckout", productPayload());
   }
 
+  function paymentGuardKey(proof, email) {
+    return "tt_fired_cp_front_" + (proof || email || "unknown");
+  }
+
+  function hasPaymentFired(proof, email) {
+    try {
+      return !!sessionStorage.getItem(paymentGuardKey(proof, email));
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function markPaymentFired(proof, email) {
+    try {
+      sessionStorage.setItem(paymentGuardKey(proof, email), "1");
+      sessionStorage.removeItem("ttk:ds24_pending");
+    } catch (e) {}
+  }
+
+  function completePayment(options) {
+    if (!window.ttq) return false;
+    options = options || {};
+
+    var qs = new URLSearchParams(window.location.search || "");
+    var buyer = readBuyer() || {};
+    var proof =
+      options.proof ||
+      qs.get("order_id") ||
+      qs.get("order_item_id") ||
+      qs.get("payment_id") ||
+      "";
+    var email =
+      (options.email || qs.get("buyer_email") || qs.get("email") || buyer.email || "")
+        .trim()
+        .toLowerCase();
+    var pending = false;
+    try {
+      pending = sessionStorage.getItem("ttk:ds24_pending") === "1";
+    } catch (e) {}
+
+    if (!proof && !email && !pending) return false;
+    if (hasPaymentFired(proof, email)) return false;
+
+    var eventId = proof
+      ? String(proof)
+      : "CompletePayment:736912:" + (email || Date.now().toString(36));
+
+    identify({
+      email: email,
+      phone: options.phone || buyer.chaveWero || buyer.chaveBizum,
+    });
+
+    ttq.track("CompletePayment", productPayload(), { event_id: eventId });
+    markPaymentFired(proof, email);
+    return true;
+  }
+
   window.ttPixel = {
     product: PRODUCT,
     identify: identify,
     viewContent: viewContent,
     initiateCheckout: initiateCheckout,
+    completePayment: completePayment,
+    hasPaymentFired: hasPaymentFired,
   };
 })();

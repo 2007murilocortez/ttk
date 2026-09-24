@@ -70,6 +70,7 @@
         "ttk:utm",
         JSON.stringify(Object.fromEntries(url.searchParams.entries()))
       );
+      sessionStorage.setItem("ttk:ds24_pending", "1");
     } catch (e) {}
 
     return url.toString();
