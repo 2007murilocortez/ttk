@@ -87,20 +87,34 @@
         window.location.replace(next + (q ? "?" + q : ""));
       }
 
-      function run() {
-        var fired = false;
-        if (window.ttPixel && typeof window.ttPixel.completePayment === "function") {
-          fired = window.ttPixel.completePayment({ proof: orderId, email: email });
-        }
-        // Aguarda o pixel enviar antes de redirecionar (DS24 redirect é muito rápido).
-        setTimeout(goNext, fired ? 3500 : 1500);
+      var pixelSent = false;
+      var redirected = false;
+
+      function firePixel() {
+        if (pixelSent) return;
+        pixelSent = true;
+        try {
+          if (window.ttPixel && typeof window.ttPixel.completePayment === "function") {
+            window.ttPixel.completePayment({ proof: orderId, email: email });
+          }
+        } catch (e) {}
       }
 
-      if (window.ttq && typeof window.ttq.ready === "function") {
-        window.ttq.ready(run);
-      } else {
-        run();
+      function safeGoNext() {
+        if (redirected) return;
+        redirected = true;
+        goNext();
       }
+
+      // Tenta pixel logo + quando ttq estiver pronto.
+      firePixel();
+      if (window.ttq && typeof window.ttq.ready === "function") {
+        window.ttq.ready(firePixel);
+      }
+
+      // Nunca ficar preso: redireciona mesmo se ttq.ready ou adblock travar o TikTok.
+      setTimeout(safeGoNext, 3000);
+      setTimeout(safeGoNext, 6000);
     })();
   </script>
 </body>
