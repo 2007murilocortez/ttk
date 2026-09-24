@@ -1,7 +1,15 @@
 'use strict';
 const config = window.DECLIC_CONFIG;
-const euro = (n) =>
-  new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+const euro = (n) => {
+  const value = Number(n);
+  const hasCents = Math.round(value * 100) % 100 !== 0;
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: hasCents ? 2 : 0,
+    maximumFractionDigits: hasCents ? 2 : 0
+  }).format(value);
+};
 const offer = document.body.dataset.offer;
 const dialog = document.querySelector('#purchase-preview');
 const approvalMode = !!config.approvalMode;

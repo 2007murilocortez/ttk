@@ -448,35 +448,5 @@
     })(window, document, "clarity", "script", "x8i711xrm5");
 </script>
 
-<!-- TikTok CompletePayment: DS24 (order_id) ou fallback funil local -->
-<script>
-(function () {
-  "use strict";
-  function run() {
-    try {
-      if (!window.ttPixel || typeof window.ttPixel.completePayment !== "function") return;
-      var qs = new URLSearchParams(window.location.search || "");
-      var cooudProof =
-        qs.get("orb_pi") ||
-        qs.get("orb_upsell_pi") ||
-        qs.get("orb_funnel_session") ||
-        qs.get("cooud_pph") ||
-        "";
-      window.ttPixel.completePayment({
-        proof: cooudProof || qs.get("order_id") || qs.get("order_item_id") || "",
-        email: qs.get("buyer_email") || qs.get("email") || "",
-      });
-    } catch (e) {}
-  }
-  if (window.ttq && typeof window.ttq.ready === "function") {
-    window.ttq.ready(run);
-  } else if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", run, { once: true });
-  } else {
-    run();
-  }
-})();
-</script>
-
 </body>
 </html>

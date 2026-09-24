@@ -6,6 +6,7 @@
   <meta name="robots" content="noindex,nofollow">
   <title>Redirection…</title>
   <script src="/js/ds24-thankyou.js"></script>
+  <script src="/learn/js/learn-config.js"></script>
   <style>
     body {
       margin: 0;
@@ -23,8 +24,10 @@
     (function () {
       var qs = window.location.search || "";
       var params = new URLSearchParams(qs);
+      var cfg = window.LEARN_CONFIG || { pages: {} };
       var isLearn =
         params.get("funnel") === "learn" ||
+        params.has("step") ||
         (function () {
           try {
             return sessionStorage.getItem("ttk:ds24_pending") === "1";
@@ -33,12 +36,34 @@
           }
         })();
 
+      var upsellNext = {
+        up1: cfg.pages && cfg.pages.up2,
+        up2: cfg.pages && cfg.pages.up3,
+        up3: cfg.pages && cfg.pages.final,
+      };
+
+      function cleanQuery() {
+        var next = new URLSearchParams(qs);
+        next.delete("funnel");
+        next.delete("step");
+        next.delete("sha_sign");
+        var q = next.toString();
+        return q ? "?" + q : "";
+      }
+
       function redirect() {
-        if (isLearn) {
-          window.location.replace("/learn/merci/" + qs);
+        if (!isLearn) {
+          window.location.replace("/app/merci/" + qs);
           return;
         }
-        window.location.replace("/app/merci/" + qs);
+
+        var step = params.get("step") || "";
+        if (step && upsellNext[step]) {
+          window.location.replace(upsellNext[step] + cleanQuery());
+          return;
+        }
+
+        window.location.replace("/learn/merci/" + qs);
       }
 
       // DS24 thank-you pixel precisa carregar nesta URL antes do redirect.
