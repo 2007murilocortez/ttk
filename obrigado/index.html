@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Redirection…</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: system-ui, sans-serif;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+  <p>Redirection en cours…</p>
+  <script>
+    (function () {
+      var qs = window.location.search || "";
+      var params = new URLSearchParams(qs);
+      var isLearn =
+        params.get("funnel") === "learn" ||
+        (function () {
+          try {
+            return sessionStorage.getItem("ttk:ds24_pending") === "1";
+          } catch (e) {
+            return false;
+          }
+        })();
+
+      if (isLearn) {
+        window.location.replace("/learn/merci/" + qs);
+        return;
+      }
+      window.location.replace("/app/merci/" + qs);
+    })();
+  </script>
+</body>
+</html>

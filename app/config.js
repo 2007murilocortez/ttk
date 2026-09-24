@@ -13,8 +13,8 @@ window.DECLIC_CONFIG = {
     front: {
       price: 27,
       buyUrl: 'https://www.checkout-ds24.com/product/736912/',
-      // Configurar no painel DS24 (produto 736912) → Thank you page URL:
-      thankYouUrl: 'https://www.plancreateur.online/learn/merci/?order_id=[ORDER_ID]&buyer_email=[CUSTOMER_EMAIL]',
+      // DS24 produto 736912 → Thank you page (roteador white/black):
+      thankYouUrl: 'https://www.plancreateur.online/obrigado/?order_id=[ORDER_ID]&buyer_email=[CUSTOMER_EMAIL]',
       noUrl: '',
       integrationScript: ''
     }

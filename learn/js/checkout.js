@@ -57,6 +57,8 @@
     var params = new URLSearchParams();
     mergeMarketingParams(params);
 
+    params.set("funnel", "learn");
+
     if (opts.email) params.set("email", String(opts.email).trim());
     if (opts.name) params.set("name", String(opts.name).trim());
     if (opts.phone) params.set("phone", String(opts.phone).trim());
