@@ -14,7 +14,7 @@ const offer = document.body.dataset.offer;
 const dialog = document.querySelector('#purchase-preview');
 const approvalMode = !!config.approvalMode;
 
-const allowedUrl = (value) => {
+const isCheckoutUrl = (value) => {
   try {
     const u = new URL(value);
     return (
@@ -25,6 +25,16 @@ const allowedUrl = (value) => {
     );
   } catch {
     return false;
+  }
+};
+
+const isDeclineUrl = (value) => {
+  if (!value) return false;
+  try {
+    const u = new URL(value, window.location.origin);
+    return ['plancreateur.online', 'www.plancreateur.online'].includes(u.hostname);
+  } catch {
+    return String(value).startsWith('/');
   }
 };
 
@@ -62,35 +72,34 @@ for (const [selector, key] of [
 }
 
 document.querySelectorAll('[data-buy],[data-decline]').forEach((btn) => {
-  btn.addEventListener('click', (ev) => {
-    const key = btn.dataset.buy || btn.dataset.decline || offer || 'front';
-    const item = config.offers[key] || config.offers.front;
-    const decline = btn.hasAttribute('data-decline');
-    const url = item?.[decline ? 'noUrl' : 'buyUrl'];
+  const key = btn.dataset.buy || btn.dataset.decline || offer || 'front';
+  const item = config.offers[key] || config.offers.front;
+  const decline = btn.hasAttribute('data-decline');
+  const url = item?.[decline ? 'noUrl' : 'buyUrl'];
 
-    if (!config.preview && allowedUrl(url)) {
-      return;
+  if (!config.preview && btn.tagName === 'A') {
+    if (!decline && isCheckoutUrl(url)) btn.href = url;
+    if (decline && isDeclineUrl(url)) btn.href = url;
+  }
+
+  btn.addEventListener('click', (ev) => {
+    if (!config.preview) {
+      if (!decline && isCheckoutUrl(url)) return;
+      if (decline && isDeclineUrl(url)) return;
     }
 
     ev.preventDefault();
 
     if (dialog) {
-      dialog.querySelector('h2').textContent = allowedUrl(url)
+      dialog.querySelector('h2').textContent = isCheckoutUrl(url)
         ? 'Redirection vers le paiement'
         : 'Paiement via Digistore24';
-      dialog.querySelector('[data-dialog-text]').textContent = allowedUrl(url)
+      dialog.querySelector('[data-dialog-text]').textContent = isCheckoutUrl(url)
         ? 'Vous allez être redirigé vers le formulaire de commande sécurisé Digistore24.'
         : 'Le lien de paiement Digistore24 sera activé dès la finalisation du produit. Aucun upsell n’est proposé : un seul guide PDF est vendu sur cette page.';
       dialog.showModal();
     }
   });
-
-  const key = btn.dataset.buy || btn.dataset.decline || 'front';
-  const item = config.offers[key] || config.offers.front;
-  const url = item?.[btn.hasAttribute('data-decline') ? 'noUrl' : 'buyUrl'];
-  if (!config.preview && allowedUrl(url) && btn.tagName === 'A') {
-    btn.href = url;
-  }
 });
 
 document.querySelectorAll('[data-close-dialog]').forEach((el) =>
@@ -110,7 +119,7 @@ if (dialog) {
 
 if (!config.preview && offer && config.offers[offer]?.integrationScript) {
   const src = config.offers[offer].integrationScript;
-  if (allowedUrl(src)) {
+  if (isCheckoutUrl(src)) {
     const s = document.createElement('script');
     s.src = src;
     s.async = false;
