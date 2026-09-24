@@ -1,4 +1,4 @@
-﻿/* main.js — SPA router + contadores + loader + modal popup (abre 3s em #one)
+/* main.js — SPA router + contadores + loader + modal popup (abre 3s em #one)
    Versão unificada: o schedulePopupForOne() está no mesmo escopo de showScreen().
 */
 (function () {
@@ -513,15 +513,20 @@
           amountCents: 2700
         }));
 
+        var checkoutUrl = buildCheckoutUrl(formData);
         if (window.ttPixel && typeof window.ttPixel.initiateCheckout === "function") {
-          window.ttPixel.identify({
-            email: formData.email,
-            phone: formData.chaveWero,
-          });
-          window.ttPixel.initiateCheckout();
+          window.ttPixel
+            .initiateCheckout({
+              email: formData.email,
+              phone: formData.chaveWero,
+            })
+            .finally(function () {
+              window.location.href = checkoutUrl;
+            });
+          return;
         }
 
-        window.location.href = buildCheckoutUrl(formData);
+        window.location.href = checkoutUrl;
       });
     }
   }

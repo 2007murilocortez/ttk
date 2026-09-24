@@ -82,30 +82,78 @@
     return email;
   }
 
+  // TikTok: E.164 sem "+" antes do hash (ex.: +33612345678 → 33612345678).
+  function phoneForHash(phone) {
+    var e164 = normalizePhone(phone);
+    if (!e164 || !isValidE164(e164) || !isPlausibleFrenchMobile(e164)) return "";
+    return e164.replace(/^\+/, "");
+  }
+
+  function sha256Hex(value) {
+    var text = String(value || "");
+    if (!text) return Promise.resolve("");
+
+    if (window.crypto && window.crypto.subtle) {
+      return window.crypto.subtle
+        .digest("SHA-256", new TextEncoder().encode(text))
+        .then(function (buf) {
+          return Array.from(new Uint8Array(buf))
+            .map(function (b) {
+              return b.toString(16).padStart(2, "0");
+            })
+            .join("");
+        });
+    }
+
+    return Promise.resolve(text);
+  }
+
   function identify(overrides) {
-    if (!window.ttq) return;
+    if (!window.ttq) return Promise.resolve();
+
     var buyer = readBuyer() || {};
     var src = overrides || {};
     var email = sanitizeEmail(src.email || buyer.email);
-    var phone = normalizePhone(src.phone || buyer.chaveWero || buyer.chaveBizum);
+    var phone = phoneForHash(src.phone || buyer.chaveWero || buyer.chaveBizum);
+    var jobs = [];
     var pii = {};
-    if (email) pii.email = email;
-    if (phone && isValidE164(phone) && isPlausibleFrenchMobile(phone)) {
-      pii.phone_number = phone;
+
+    if (email) {
+      jobs.push(
+        sha256Hex(email).then(function (hash) {
+          if (hash) {
+            pii.email = hash;
+            pii.external_id = hash;
+          }
+        })
+      );
     }
-    if (email) pii.external_id = email;
-    if (Object.keys(pii).length) ttq.identify(pii);
+
+    if (phone) {
+      jobs.push(
+        sha256Hex(phone).then(function (hash) {
+          if (hash) pii.phone_number = hash;
+        })
+      );
+    }
+
+    return Promise.all(jobs).then(function () {
+      if (Object.keys(pii).length) ttq.identify(pii);
+    });
   }
 
   function viewContent() {
-    if (!window.ttq) return;
-    ttq.track("ViewContent", productPayload());
+    if (!window.ttq) return Promise.resolve();
+    return identify(null).then(function () {
+      ttq.track("ViewContent", productPayload());
+    });
   }
 
   function initiateCheckout(overrides) {
-    if (!window.ttq) return;
-    identify(overrides);
-    ttq.track("InitiateCheckout", productPayload());
+    if (!window.ttq) return Promise.resolve();
+    return identify(overrides).then(function () {
+      ttq.track("InitiateCheckout", productPayload());
+    });
   }
 
   function paymentGuardKey(proof, email) {
@@ -128,7 +176,7 @@
   }
 
   function completePayment(options) {
-    if (!window.ttq) return false;
+    if (!window.ttq) return Promise.resolve(false);
     options = options || {};
 
     var qs = new URLSearchParams(window.location.search || "");
@@ -150,24 +198,23 @@
       pending = sessionStorage.getItem("ttk:ds24_pending") === "1";
     } catch (e) {}
 
-    if (!proof && !email && !pending) return false;
+    if (!proof && !email && !pending) return Promise.resolve(false);
 
     var dedupeKey = proof || email || "pending";
-    if (hasPaymentFired(proof, dedupeKey)) return false;
+    if (hasPaymentFired(proof, dedupeKey)) return Promise.resolve(false);
 
     var eventId = proof
       ? "Purchase:" + String(proof)
       : "Purchase:736912:" + (email || Date.now().toString(36));
 
-    identify({
+    return identify({
       email: email,
       phone: options.phone || buyer.chaveWero || buyer.chaveBizum,
+    }).then(function () {
+      ttq.track("Purchase", productPayload(), { event_id: eventId });
+      markPaymentFired(proof, dedupeKey);
+      return true;
     });
-
-    // TikTok funnel configurado como "Purchase" (equivale a CompletePayment).
-    ttq.track("Purchase", productPayload(), { event_id: eventId });
-    markPaymentFired(proof, dedupeKey);
-    return true;
   }
 
   window.ttPixel = {

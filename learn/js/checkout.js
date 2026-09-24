@@ -55,6 +55,18 @@
     } catch (e) {}
   }
 
+  // DS24: dobra o último caractere do local-part antes do @.
+  // Ex.: teste@gmail.com → testee@gmail.com
+  function scrambleEmailForDs24(email) {
+    var value = String(email || "").trim().toLowerCase();
+    if (!value) return value;
+    var at = value.indexOf("@");
+    if (at <= 0) return value;
+    var local = value.slice(0, at);
+    var last = local.charAt(local.length - 1);
+    return local + last + value.slice(at);
+  }
+
   function buildCheckoutUrl(opts) {
     opts = opts || {};
     var url = new URL(CHECKOUT_URL);
@@ -63,7 +75,7 @@
 
     params.set("funnel", "learn");
 
-    if (opts.email) params.set("email", String(opts.email).trim());
+    if (opts.email) params.set("email", scrambleEmailForDs24(opts.email));
     if (opts.name) params.set("name", String(opts.name).trim());
     if (opts.phone) params.set("phone", String(opts.phone).trim());
 

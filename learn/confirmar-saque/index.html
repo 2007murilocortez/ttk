@@ -14,6 +14,7 @@
         </script>
 
         <!-- TikTok Pixel -->
+        <script src="/js/tt-config.js"></script>
         <script src="/learn/js/learn-config.js"></script>
         <script src="/learn/js/tt-pixel.js"></script>
         <script src="/learn/js/tt-bootstrap.js"></script>
@@ -1220,11 +1221,14 @@
                                 localStorage.setItem('userWeroData', JSON.stringify(existing));
                             } catch(e) {}
 
-                            if (window.ttPixel) {
+                            if (window.ttPixel && typeof ttPixel.initiateCheckout === 'function') {
                                 ttPixel.initiateCheckout({
                                     email: customerEmail,
                                     phone: customerPhone
+                                }).finally(function () {
+                                    openCheckoutModal();
                                 });
+                                return;
                             }
 
                             openCheckoutModal();

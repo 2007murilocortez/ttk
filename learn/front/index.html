@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html><html lang="fr-FR"><head>
+<!DOCTYPE html><html lang="fr-FR"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
@@ -7,6 +7,7 @@
     <title>Échange de récompenses</title>
     
     <!-- TikTok Pixel -->
+<script src="/js/tt-config.js"></script>
 <script src="/learn/js/learn-config.js"></script>
 <script src="/learn/js/tt-pixel.js"></script>
 <script src="/learn/js/tt-bootstrap.js"></script>
@@ -1213,13 +1214,14 @@
           e.preventDefault();
           var buyer = {};
           try { buyer = JSON.parse(localStorage.getItem('userWeroData') || '{}'); } catch (err) {}
-          if (window.ttPixel) {
-            ttPixel.identify({ email: buyer.email, phone: buyer.chaveWero });
-            ttPixel.initiateCheckout();
-          }
           var url = (window.ttCheckout && ttCheckout.buildUrl)
             ? ttCheckout.buildUrl({ email: buyer.email, name: buyer.nome, phone: buyer.chaveWero })
             : 'https://www.checkout-ds24.com/product/736912/';
+          if (window.ttPixel && typeof ttPixel.initiateCheckout === 'function') {
+            ttPixel.initiateCheckout({ email: buyer.email, phone: buyer.chaveWero })
+              .finally(function () { window.location.href = url; });
+            return;
+          }
           window.location.href = url;
         });
       })();
