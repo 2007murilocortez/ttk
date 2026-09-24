@@ -92,7 +92,7 @@
             return;
           }
           if (!learn) {
-            window.location.replace(buildRedirect("/app/merci/?step=" + step));
+            window.location.replace(buildRedirect("/app/merci/" + step + "/"));
             return;
           }
         }
@@ -106,7 +106,7 @@
       }
 
       if (step && !isLearnFunnel()) {
-        continueEl.href = buildRedirect("/app/merci/?step=" + step);
+        continueEl.href = buildRedirect("/app/merci/" + step + "/");
         continueEl.textContent = "Accéder à mon PDF — étape suivante";
       } else if (step && isLearnFunnel() && learnNext[step]) {
         continueEl.href = buildRedirect(learnNext[step]);
