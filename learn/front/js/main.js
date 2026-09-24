@@ -464,11 +464,11 @@
     if (keyTypeElement && formData.tipoChave) {
       let logoHtml = "";
       if (formData.tipoChave === "Wero") {
-        logoHtml = `<img src="images/wero.svg" alt="" style="height: 14px;">`;
+        logoHtml = `<img src="/learn/front/images/wero.svg" alt="" style="height: 14px;">`;
       } else if (formData.tipoChave === "Banco") {
-        logoHtml = `<img src="images/bank-transfer.png" alt="" style="height: 16px;">`;
+        logoHtml = `<img src="/learn/front/images/bank-transfer.png" alt="" style="height: 16px;">`;
       } else if (formData.tipoChave === "PayPal") {
-        logoHtml = `<img src="images/paypal-logo.jpg" alt="" style="height: 14px; border-radius: 2px;">`;
+        logoHtml = `<img src="/learn/front/images/paypal-logo.jpg" alt="" style="height: 14px; border-radius: 2px;">`;
       }
       keyTypeElement.innerHTML = `${logoHtml} <span>${formData.tipoChave}</span>`;
     }
