@@ -11,8 +11,9 @@ const allowedUrl = (value) => {
     const u = new URL(value);
     return (
       u.protocol === 'https:' &&
-      (['digistore24.com', 'www.digistore24.com', 'app.digistore24.com'].includes(u.hostname) ||
-        u.hostname.endsWith('.digistore24.com'))
+      (['digistore24.com', 'www.digistore24.com', 'app.digistore24.com', 'checkout-ds24.com', 'www.checkout-ds24.com'].includes(u.hostname) ||
+        u.hostname.endsWith('.digistore24.com') ||
+        u.hostname.endsWith('.checkout-ds24.com'))
     );
   } catch {
     return false;

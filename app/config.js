@@ -1,6 +1,6 @@
 window.DECLIC_CONFIG = {
   approvalMode: true,
-  preview: true,
+  preview: false,
   supportEmail: 'support@plancreateur.online',
   // Preencher antes de submeter na Digistore24:
   publisherName: 'Murilo Cortez',
@@ -10,6 +10,6 @@ window.DECLIC_CONFIG = {
   privacyContact: 'support@plancreateur.online',
   refundDays: 60,
   offers: {
-    front: { price: 27, buyUrl: '', noUrl: '', integrationScript: '' }
+    front: { price: 27, buyUrl: 'https://www.checkout-ds24.com/product/736912/', noUrl: '', integrationScript: '' }
   }
 };
