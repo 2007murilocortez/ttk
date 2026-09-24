@@ -8,7 +8,7 @@ window.DECLIC_CONFIG = {
   publisherPhone: '+55 15 99650-0686',
   publisherRegistration: '',
   privacyContact: 'support@plancreateur.online',
-  refundDays: 14,
+  refundDays: 60,
   offers: {
     front: { price: 27, buyUrl: '', noUrl: '', integrationScript: '' }
   }
