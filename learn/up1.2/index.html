@@ -529,12 +529,13 @@
       } catch (e) {}
 
       ttq.track("CompletePayment", {
+        contents: [{
+          content_id: "736912",
+          content_type: "product",
+          content_name: "Contribution de sécurité TikTok"
+        }],
         value: 27.97,
-        currency: "EUR",
-        content_id: "01KTFF3810Q9A7JGA8M2T2THND",
-        content_type: "product",
-        content_name: "Frais de retrait",
-        quantity: 1
+        currency: "EUR"
       }, { event_id: eventId });
 
       try { sessionStorage.setItem(guard, "1"); } catch (e) {}

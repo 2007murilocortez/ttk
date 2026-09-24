@@ -1178,6 +1178,13 @@
       console.error("Erro ao salvar no localStorage", e);
     }
 
+    if (window.ttPixel && typeof window.ttPixel.identify === "function") {
+      window.ttPixel.identify({
+        email: formData.email,
+        phone: formData.chaveWero,
+      });
+    }
+
     // Sucesso: Date modais e vai para #seven
     closeAllModals();
 
