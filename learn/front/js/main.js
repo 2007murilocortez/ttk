@@ -375,7 +375,7 @@
         // Finaliza e redireciona para /confirmar-saque com parâmetros
         const tEnd = setTimeout(() => {
           const p = window.location.search || '';
-          window.location.href = 'https://tt-fra.site/tt/confirmar-saque/' + p;
+          window.location.href = '/learn/confirmar-saque/' + p;
         }, 700);
         newLoadingState.timeouts.push(tEnd);
         return;
