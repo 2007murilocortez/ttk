@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
   <title>Redirection…</title>
+  <script src="/js/ds24-thankyou.js"></script>
   <style>
     body {
       margin: 0;
@@ -32,11 +33,16 @@
           }
         })();
 
-      if (isLearn) {
-        window.location.replace("/learn/merci/" + qs);
-        return;
+      function redirect() {
+        if (isLearn) {
+          window.location.replace("/learn/merci/" + qs);
+          return;
+        }
+        window.location.replace("/app/merci/" + qs);
       }
-      window.location.replace("/app/merci/" + qs);
+
+      // DS24 thank-you pixel precisa carregar nesta URL antes do redirect.
+      setTimeout(redirect, 1200);
     })();
   </script>
 </body>
