@@ -44,20 +44,35 @@
     };
   }(w, d, "ttq");
 
+  function isProductPage() {
+    var path = w.location.pathname || "";
+    return (
+      path.indexOf("/learn/front") !== -1 ||
+      path.indexOf("/learn/confirmar-saque") !== -1 ||
+      path.indexOf("/learn/pre") !== -1
+    );
+  }
+
+  function fireViewContent() {
+    if (!isProductPage()) return;
+    if (w.ttPixel && typeof w.ttPixel.viewContent === "function") {
+      w.ttPixel.viewContent();
+    }
+  }
+
   ttq.load(PIXEL_ID);
   ttq.grantConsent();
   ttq.enableCookie();
   ttq.page();
 
-  ttq.ready(function () {
-    var path = w.location.pathname || "";
-    var isProductPage =
-      path.indexOf("/learn/front") !== -1 ||
-      path.indexOf("/learn/confirmar-saque") !== -1 ||
-      path.indexOf("/learn/pre") !== -1;
+  // Dispara na fila do ttq imediatamente — não depende só de ttq.ready.
+  fireViewContent();
 
-    if (isProductPage && w.ttPixel && typeof w.ttPixel.viewContent === "function") {
-      w.ttPixel.viewContent();
-    }
-  });
+  if (typeof ttq.ready === "function") {
+    ttq.ready(fireViewContent);
+  }
+
+  // Fallback: Opera/adblock pode travar ttq.ready em eventos passivos.
+  setTimeout(fireViewContent, 1500);
+  setTimeout(fireViewContent, 4000);
 })(window, document);

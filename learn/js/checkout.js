@@ -15,6 +15,7 @@
     "src",
     "sck",
     "ttclid",
+    "tt_test_id",
     "fbclid",
     "gclid",
   ];

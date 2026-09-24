@@ -142,8 +142,11 @@
     });
   }
 
+  var viewContentSent = false;
+
   function viewContent() {
-    if (!window.ttq) return Promise.resolve();
+    if (!window.ttq || viewContentSent) return Promise.resolve();
+    viewContentSent = true;
     ttq.track("ViewContent", productPayload());
     return identify(null);
   }
