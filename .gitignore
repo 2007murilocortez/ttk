@@ -1,0 +1,17 @@
+# zips e extrações temporárias
+*.zip
+_compare/
+declic-video-site/
+tt/
+_fix_paths.py
+
+# deps / runtime
+node_modules/
+.sites-runtime/
+*.tar.gz
+*.tar
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
