@@ -44,8 +44,12 @@ for (const [selector, key] of [
   ['[data-publisher]', 'publisherName'],
   ['[data-address]', 'publisherAddress'],
   ['[data-registration]', 'publisherRegistration'],
+  ['[data-phone]', 'publisherPhone'],
+  ['[data-refund-days]', 'refundDays'],
 ]) {
-  if (config[key]) document.querySelectorAll(selector).forEach((el) => (el.textContent = config[key]));
+  if (config[key] !== undefined && config[key] !== null && config[key] !== '') {
+    document.querySelectorAll(selector).forEach((el) => (el.textContent = config[key]));
+  }
 }
 
 document.querySelectorAll('[data-buy],[data-decline]').forEach((btn) => {

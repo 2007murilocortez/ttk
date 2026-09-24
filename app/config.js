@@ -1,14 +1,14 @@
 window.DECLIC_CONFIG = {
-  // true = página limpa para aprovação Digistore24 (sem upsells)
-  // false = após aprovação, reativar upsells ou trocar para black via cloaking
   approvalMode: true,
   preview: true,
   supportEmail: 'support@plancreateur.online',
-  publisherName: '',
-  publisherAddress: '',
+  // Preencher antes de submeter na Digistore24:
+  publisherName: 'Plan Créateur',
+  publisherAddress: 'France',
+  publisherPhone: '+33 1 88 99 27 66',
   publisherRegistration: '',
   privacyContact: 'support@plancreateur.online',
-  refundDays: null,
+  refundDays: 14,
   offers: {
     front: { price: 27, buyUrl: '', noUrl: '', integrationScript: '' }
   }
