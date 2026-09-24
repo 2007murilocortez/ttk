@@ -8,7 +8,7 @@ window.DECLIC_CONFIG = {
   publisherPhone: '+55 15 99650-0686',
   publisherRegistration: '',
   privacyContact: 'support@plancreateur.online',
-  refundDays: 60,
+  refundDays: 14,
   offers: {
     front: { price: 27, buyUrl: 'https://www.checkout-ds24.com/product/736912/', noUrl: '', integrationScript: '' }
   }
