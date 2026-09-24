@@ -144,9 +144,8 @@
 
   function viewContent() {
     if (!window.ttq) return Promise.resolve();
-    return identify(null).then(function () {
-      ttq.track("ViewContent", productPayload());
-    });
+    ttq.track("ViewContent", productPayload());
+    return identify(null);
   }
 
   function initiateCheckout(overrides) {
