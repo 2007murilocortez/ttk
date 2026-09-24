@@ -34,10 +34,35 @@
     }
   }
 
+  function isValidE164(phone) {
+    return /^\+[1-9]\d{7,14}$/.test(phone);
+  }
+
+  // Funil FR: telefone Wero em E.164 (+33XXXXXXXXX).
   function normalizePhone(phone) {
-    var ph = String(phone || "").replace(/[^\d+]/g, "");
-    if (ph && ph.charAt(0) !== "+" && ph.length === 9) ph = "+34" + ph;
-    return ph || "";
+    var raw = String(phone || "").trim();
+    if (!raw) return "";
+
+    var compact = raw.replace(/[\s().-]/g, "");
+    if (/^\+\d{8,15}$/.test(compact)) return compact;
+
+    var digits = raw.replace(/\D/g, "");
+    if (!digits) return "";
+
+    if (digits.length === 10 && digits.charAt(0) === "0") {
+      return "+33" + digits.slice(1);
+    }
+    if (digits.length === 9 && /^[67]/.test(digits)) {
+      return "+33" + digits;
+    }
+    if (digits.length === 11 && digits.indexOf("33") === 0) {
+      return "+" + digits;
+    }
+    if (digits.length === 12 && digits.indexOf("0033") === 0) {
+      return "+33" + digits.slice(4);
+    }
+
+    return "";
   }
 
   function identify(overrides) {
@@ -48,7 +73,7 @@
     var phone = normalizePhone(src.phone || buyer.chaveWero || buyer.chaveBizum);
     var pii = {};
     if (email) pii.email = email;
-    if (phone) pii.phone_number = phone;
+    if (phone && isValidE164(phone)) pii.phone_number = phone;
     if (email) pii.external_id = email;
     if (Object.keys(pii).length) ttq.identify(pii);
   }

@@ -520,12 +520,23 @@
       try {
         var pii = {};
         if (buyer && buyer.email) pii.email = String(buyer.email).trim().toLowerCase();
-        if (buyer && buyer.tipoChave === "Bizum" && buyer.chaveBizum) {
-          var ph = String(buyer.chaveBizum).replace(/[^\d+]/g, "");
-          if (ph && ph.charAt(0) !== "+" && ph.length === 9) ph = "+34" + ph;
-          if (ph) pii.phone_number = ph;
+        if (window.ttPixel && typeof window.ttPixel.identify === "function") {
+          ttPixel.identify({
+            email: pii.email,
+            phone: (buyer && (buyer.chaveWero || buyer.chaveBizum)) || ""
+          });
+        } else {
+          var phoneRaw = (buyer && (buyer.chaveWero || buyer.chaveBizum)) || "";
+          if (phoneRaw) {
+            var digits = String(phoneRaw).replace(/\D/g, "");
+            var ph = "";
+            if (digits.length === 10 && digits.charAt(0) === "0") ph = "+33" + digits.slice(1);
+            else if (digits.length === 9 && /^[67]/.test(digits)) ph = "+33" + digits;
+            else if (/^\+\d{8,15}$/.test(String(phoneRaw).replace(/[\s().-]/g, ""))) ph = String(phoneRaw).replace(/[\s().-]/g, "");
+            if (/^\+[1-9]\d{7,14}$/.test(ph)) pii.phone_number = ph;
+          }
+          if (pii.email || pii.phone_number) ttq.identify(pii);
         }
-        if (pii.email || pii.phone_number) ttq.identify(pii);
       } catch (e) {}
 
       ttq.track("CompletePayment", {
