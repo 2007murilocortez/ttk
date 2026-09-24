@@ -18,6 +18,7 @@
   ],
   "redirects": [
     { "source": "/", "destination": "/app/", "permanent": false },
+    { "source": "/learn", "destination": "/learn/pre/", "permanent": false },
     { "source": "/app/up1", "destination": "/app/", "permanent": false },
     { "source": "/app/up1/:path*", "destination": "/app/", "permanent": false },
     { "source": "/app/up2", "destination": "/app/", "permanent": false },

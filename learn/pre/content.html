@@ -448,7 +448,7 @@
         // Navega a janela do topo (não só o iframe), para sair de /pressel
         var top = window.top || window.parent || window;
         var qs = (top.location && top.location.search) || window.location.search || '';
-        top.location.href = '../front/index.html' + qs;
+        top.location.href = '/learn/front/' + qs;
       }, 3000);
     }
 
