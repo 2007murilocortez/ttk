@@ -1,7 +1,7 @@
 (function (w, d) {
   "use strict";
 
-  var PIXEL_ID = w.TT_PIXEL_ID || "DAQKRK3C77UFPT804E80";
+  var PIXEL_ID = w.TT_PIXEL_ID || "DAQMPF3C77U6JDP8JH3G";
 
   !function (win, doc, t) {
     win.TiktokAnalyticsObject = t;
