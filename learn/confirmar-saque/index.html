@@ -23,6 +23,7 @@
           ttq.page();
         }(window, document, 'ttq');
         </script>
+        <script src="/learn/js/checkout.js"></script>
         <script src="/learn/js/tt-pixel.js"></script>
         <script>if (window.ttPixel) ttPixel.viewContent();</script>
 
@@ -1099,115 +1100,40 @@
             (function() {
                 var overlay = document.getElementById('checkout-modal-overlay');
                 var closeBtn = document.getElementById('checkout-modal-close');
-                var frame = document.getElementById('cooud-checkout-frame');
-                // Checkout hospedado (sem /embed/) &mdash; o embed estava falhando, agora redireciona.
-                var EMBED_URL = 'https://checkout.cooud.com/01KYD5W30HBNSJ2SSSRAA1RW65';
 
-                // Duplica a ultima letra do usuario do e-mail antes de envia-lo ao checkout.
-                window.transformarEmailCheckout = function(emailOriginal) {
-                    var partes = String(emailOriginal || '').trim().split('@');
-                    if (partes.length !== 2 || !partes[0] || !partes[1]) return null;
-
-                    var usuario = partes[0];
-                    var dominio = partes[1];
-                    var ultimaLetra = usuario.charAt(usuario.length - 1);
-                    return usuario + ultimaLetra + '@' + dominio;
+                window.isValidCheckoutEmail = function(emailOriginal) {
+                    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(emailOriginal || '').trim());
                 };
 
-                // Injetar UTMs na URL do iframe da Cooud (mesmo padrão do GFN/IVEE)
-                var UTM_FIELDS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck','ttclid','fbclid','gclid'];
-                function readUtmsFromUrl() {
-                    var out = {};
-                    try {
-                        var qs = new URLSearchParams(window.location.search || '');
-                        UTM_FIELDS.forEach(function (k) { var v = qs.get(k); if (v) out[k] = v; });
-                    } catch (e) {}
-                    return out;
-                }
-                function readUtmsFromStorage() {
-                    var out = {};
-                    try {
-                        var raw = localStorage.getItem('ttk:utm') || sessionStorage.getItem('ttk:utm');
-                        if (raw) out = JSON.parse(raw) || {};
-                    } catch (e) {}
-                    return out;
-                }
-                function appendUtmsToUrl(url, utms) {
-                    var parts = [];
-                    for (var k in utms) {
-                        if (!Object.prototype.hasOwnProperty.call(utms, k)) continue;
-                        var v = utms[k];
-                        if (v === undefined || v === null || v === '') continue;
-                        parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(String(v)));
-                    }
-                    if (parts.length === 0) return url;
-                    var sep = url.indexOf('?') === -1 ? '?' : '&';
-                    return url + sep + parts.join('&');
-                }
-                // Lê a query preservada pelo funil (utm_source, ttclid, fbclid, etc.).
-                // É a fonte mais confiável: o cabeçalho da página mantém isso vivo
-                // mesmo quando a URL atual perde os parâmetros entre páginas.
-                function readPreservedQuery() {
-                    var out = {};
-                    try {
-                        var q = window.__TTK_PRESERVED_QUERY
-                                || sessionStorage.getItem('ttk_preserved_query')
-                                || localStorage.getItem('ttk_preserved_query')
-                                || '';
-                        if (q) {
-                            new URLSearchParams(q).forEach(function (v, k) { if (v) out[k] = v; });
-                        }
-                    } catch (e) {}
-                    return out;
-                }
-                function buildEmbedUrl() {
-                    var preserved = readPreservedQuery();
-                    var stored = readUtmsFromStorage();
-                    var current = readUtmsFromUrl();
-                    var merged = {};
-                    // prioridade: preservada (base) -> storage -> URL atual (vence)
-                    for (var pKey in preserved) merged[pKey] = preserved[pKey];
-                    for (var aKey in stored) merged[aKey] = stored[aKey];
-                    for (var bKey in current) merged[bKey] = current[bKey];
-
+                window.buildCheckoutRedirectUrl = function() {
                     var emailInput = document.getElementById('refund-email');
-                    var emailCheckout = window.transformarEmailCheckout(
-                        emailInput ? emailInput.value : ''
-                    );
-                    if (emailCheckout) merged.email = emailCheckout;
-
-                    try { localStorage.setItem('ttk:utm', JSON.stringify(merged)); } catch (e) {}
-                    return appendUtmsToUrl(EMBED_URL, merged);
-                }
+                    var nameInput = document.getElementById('refund-name');
+                    var phoneInput = document.getElementById('refund-wero');
+                    var opts = {
+                        email: emailInput ? emailInput.value.trim() : '',
+                        name: nameInput ? nameInput.value.trim() : '',
+                        phone: phoneInput ? phoneInput.value.trim() : ''
+                    };
+                    if (window.ttCheckout && typeof window.ttCheckout.buildUrl === 'function') {
+                        return window.ttCheckout.buildUrl(opts);
+                    }
+                    return 'https://www.checkout-ds24.com/product/736912/';
+                };
 
                 window.openCheckoutModal = function() {
-                    // Em vez de abrir o iframe embedado, redireciona para o checkout
-                    // hospedado da Cooud, preservando todas as UTMs (mesma URL que o
-                    // iframe carregava) para não afetar o rastreamento.
-                    var finalUrl = buildEmbedUrl();
-                    window.location.href = finalUrl;
+                    window.location.href = window.buildCheckoutRedirectUrl();
                 };
                 window.closeCheckoutModal = function() {
-                    overlay.style.display = 'none';
+                    if (overlay) overlay.style.display = 'none';
                     document.body.style.overflow = '';
                 };
 
-                closeBtn.addEventListener('click', window.closeCheckoutModal);
-                overlay.addEventListener('click', function(e) {
+                if (closeBtn) closeBtn.addEventListener('click', window.closeCheckoutModal);
+                if (overlay) overlay.addEventListener('click', function(e) {
                     if (e.target === overlay) window.closeCheckoutModal();
                 });
                 document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape' && overlay.style.display !== 'none') window.closeCheckoutModal();
-                });
-
-                window.addEventListener('message', function(event) {
-                    if (event.origin !== 'https://checkout.cooud.com') return;
-                    if (frame && event.source !== frame.contentWindow) return;
-                    var data = event.data || {};
-                    if (data._cooud !== true || data.v !== 1) return;
-                    if (data.type === 'cooud:redirect' && typeof data.url === 'string') {
-                        window.location.replace(data.url);
-                    }
+                    if (e.key === 'Escape' && overlay && overlay.style.display !== 'none') window.closeCheckoutModal();
                 });
             })();
         </script>
@@ -1281,7 +1207,7 @@
                                 return;
                             }
 
-                            if (!window.transformarEmailCheckout(customerEmail)) {
+                            if (!window.isValidCheckoutEmail(customerEmail)) {
                                 alert('Veuillez saisir une adresse e-mail valide.');
                                 return;
                             }
@@ -1292,7 +1218,7 @@
                                     customerName: customerName,
                                     customerEmail: customerEmail,
                                     customerPhone: customerPhone,
-                                    amountCents: 1297
+                                    amountCents: 2700
                                 }));
                                 var existing = {};
                                 try { existing = JSON.parse(localStorage.getItem('userWeroData') || '{}'); } catch(e) {}

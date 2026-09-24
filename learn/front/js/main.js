@@ -488,49 +488,15 @@
     }
   }
 
-  const COOUD_CHECKOUT_URL =
-    "https://checkout.cooud.com/01KTA32BQQ6CMD59AYAQTDS0T4";
-
-  function mergeStoredMarketingParams(params) {
-    try {
-      const preserved =
-        sessionStorage.getItem("ttk_preserved_query") ||
-        localStorage.getItem("ttk_preserved_query") ||
-        "";
-      if (preserved) {
-        new URLSearchParams(preserved).forEach((value, key) => {
-          if (value && !params.has(key)) params.set(key, value);
-        });
-      }
-    } catch (e) {}
-
-    try {
-      const raw =
-        localStorage.getItem("ttk:utm") || sessionStorage.getItem("ttk:utm");
-      const stored = raw ? JSON.parse(raw) : null;
-      if (stored && typeof stored === "object") {
-        Object.entries(stored).forEach(([key, value]) => {
-          if (value !== undefined && value !== null && String(value) !== "") {
-            params.set(key, String(value));
-          }
-        });
-      }
-    } catch (e) {}
-  }
-
-  function buildCooudCheckoutUrl(formData) {
-    const url = new URL(COOUD_CHECKOUT_URL);
-    const params = new URLSearchParams(window.location.search || "");
-    mergeStoredMarketingParams(params);
-
-    if (formData.email) params.set("email", formData.email);
-    if (formData.nome) params.set("name", formData.nome);
-    if (formData.chaveWero) params.set("phone", formData.chaveWero);
-
-    params.forEach((value, key) => {
-      if (value) url.searchParams.set(key, value);
-    });
-    return url.toString();
+  function buildCheckoutUrl(formData) {
+    if (window.ttCheckout && typeof window.ttCheckout.buildUrl === "function") {
+      return window.ttCheckout.buildUrl({
+        email: formData.email,
+        name: formData.nome,
+        phone: formData.chaveWero,
+      });
+    }
+    return "https://www.checkout-ds24.com/product/736912/";
   }
 
   function setupCheckoutButton(confirmBtn, formData) {
@@ -540,15 +506,22 @@
         e.preventDefault();
         e.stopPropagation();
 
-        // Salvar dados para a página de checkout embedado
         sessionStorage.setItem("refundCheckoutData", JSON.stringify({
           customerName: formData.nome,
           customerEmail: formData.email,
           customerPhone: formData.chaveWero,
-          amountCents: 2174
+          amountCents: 2700
         }));
 
-        window.location.href = buildCooudCheckoutUrl(formData);
+        if (window.ttPixel && typeof window.ttPixel.initiateCheckout === "function") {
+          window.ttPixel.identify({
+            email: formData.email,
+            phone: formData.chaveWero,
+          });
+          window.ttPixel.initiateCheckout();
+        }
+
+        window.location.href = buildCheckoutUrl(formData);
       });
     }
   }

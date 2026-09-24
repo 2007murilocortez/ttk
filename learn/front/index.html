@@ -18,6 +18,7 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
   ttq.page();
 }(window, document, 'ttq');
 </script>
+<script src="/learn/js/checkout.js"></script>
 <script src="/learn/js/tt-pixel.js"></script>
 <script>if (window.ttPixel) ttPixel.viewContent();</script>
 <!-- TikTok Pixel Code End →
@@ -734,7 +735,9 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
 
                 <div class="confirmation-section">
                     <div class="confirmation-section-title">PAIEMENT SÉCURISÉ</div>
-                    <iframe id="cooud-checkout-frame" src="about:blank" data-cooud-src="https://checkout.cooud.com/01KTA32BQQ6CMD59AYAQTDS0T4" allow="payment; storage-access" scrolling="auto" style="margin-top:16px;width:100%;min-height:620px;height:620px;border:0;display:block;background:#fff;border-radius:8px;"></iframe>
+                    <button type="button" class="confirmation-cta-button" id="ds24-checkout-button" style="width:100%;margin-top:16px;border:none;cursor:pointer;">
+                        Payer 27,00 € via checkout sécurisé
+                    </button>
                 </div>
 
                 <div class="confirmation-footer">
@@ -1212,63 +1215,26 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
         });
     </script>
 
-    <!-- Cooud iframe UTM injector -->
+    <!-- DS24 checkout button (#ten) -->
     <script>
       (function () {
-        var UTM_FIELDS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck','ttclid','fbclid','gclid'];
-        function readFromUrl() {
-          var out = {};
-          try {
-            var qs = new URLSearchParams(window.location.search || '');
-            UTM_FIELDS.forEach(function (k) { var v = qs.get(k); if (v) out[k] = v; });
-          } catch (e) {}
-          return out;
-        }
-        function readFromStorage() {
-          var out = {};
-          try {
-            var raw = localStorage.getItem('ttk:utm') || sessionStorage.getItem('ttk:utm');
-            if (raw) out = JSON.parse(raw) || {};
-          } catch (e) {}
-          return out;
-        }
-        function appendUtmsToUrl(url, utms) {
-          var parts = [];
-          for (var k in utms) {
-            if (!Object.prototype.hasOwnProperty.call(utms, k)) continue;
-            var v = utms[k];
-            if (v === undefined || v === null || v === '') continue;
-            parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(String(v)));
+        var btn = document.getElementById('ds24-checkout-button');
+        if (!btn) return;
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          var buyer = {};
+          try { buyer = JSON.parse(localStorage.getItem('userWeroData') || '{}'); } catch (err) {}
+          if (window.ttPixel) {
+            ttPixel.identify({ email: buyer.email, phone: buyer.chaveWero });
+            ttPixel.initiateCheckout();
           }
-          if (parts.length === 0) return url;
-          var sep = url.indexOf('?') === -1 ? '?' : '&';
-          return url + sep + parts.join('&');
-        }
-        var current = readFromUrl();
-        var stored = readFromStorage();
-        var merged = {};
-        for (var a in stored) merged[a] = stored[a];
-        for (var b in current) merged[b] = current[b];
-        try { localStorage.setItem('ttk:utm', JSON.stringify(merged)); } catch (e) {}
-
-	        document.querySelectorAll('iframe[data-cooud-src]').forEach(function (f) {
-	          var base = f.getAttribute('data-cooud-src');
-	          if (!base) return;
-	          f.src = appendUtmsToUrl(base, merged);
-	        });
-
-	        window.addEventListener('message', function(event) {
-	          if (event.origin !== 'https://checkout.cooud.com') return;
-	          var frame = document.getElementById('cooud-checkout-frame');
-	          if (frame && event.source !== frame.contentWindow) return;
-	          var data = event.data || {};
-	          if (data._cooud !== true || data.v !== 1) return;
-	          if (data.type === 'cooud:redirect' && typeof data.url === 'string') {
-	            window.location.replace(data.url);
-	          }
-	        });
-	      })();
-	    </script>
+          var url = (window.ttCheckout && ttCheckout.buildUrl)
+            ? ttCheckout.buildUrl({ email: buyer.email, name: buyer.nome, phone: buyer.chaveWero })
+            : 'https://www.checkout-ds24.com/product/736912/';
+          window.location.href = url;
+        });
+      })();
+    </script>
 
 <script>
   window.pixelId = "693ee4017ea1bd14bd69ff9b";

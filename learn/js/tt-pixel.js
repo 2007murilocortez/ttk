@@ -5,7 +5,7 @@
     contentId: "736912",
     contentName: "Contribution de sécurité TikTok",
     contentType: "product",
-    value: 27.97,
+    value: 27,
     currency: "EUR",
   };
 
