@@ -15,10 +15,17 @@
     "src",
     "sck",
     "ttclid",
-    "tt_test_id",
     "fbclid",
     "gclid",
   ];
+
+  // Nunca persistir/propagar — mantém eventos em produção após teste TikTok.
+  function stripTestParams(params) {
+    if (params && typeof params.delete === "function") {
+      params.delete("tt_test_id");
+    }
+    return params;
+  }
 
   function mergeMarketingParams(params) {
     try {
@@ -28,7 +35,8 @@
         localStorage.getItem("ttk_preserved_query") ||
         "";
       if (preserved) {
-        new URLSearchParams(preserved).forEach(function (value, key) {
+        var preservedParams = stripTestParams(new URLSearchParams(preserved));
+        preservedParams.forEach(function (value, key) {
           if (value && !params.has(key)) params.set(key, value);
         });
       }
@@ -39,6 +47,7 @@
         localStorage.getItem("ttk:utm") || sessionStorage.getItem("ttk:utm");
       var stored = raw ? JSON.parse(raw) : null;
       if (stored && typeof stored === "object") {
+        delete stored.tt_test_id;
         Object.keys(stored).forEach(function (key) {
           var value = stored[key];
           if (value !== undefined && value !== null && String(value) !== "") {
@@ -54,6 +63,8 @@
         if (value) params.set(key, value);
       });
     } catch (e) {}
+
+    stripTestParams(params);
   }
 
   // DS24: dobra o último caractere do local-part antes do @.
@@ -85,6 +96,7 @@
     });
 
     try {
+      stripTestParams(url.searchParams);
       localStorage.setItem(
         "ttk:utm",
         JSON.stringify(Object.fromEntries(url.searchParams.entries()))
