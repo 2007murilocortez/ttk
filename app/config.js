@@ -21,7 +21,7 @@ window.DECLIC_CONFIG = {
       price: 19.9,
       buyUrl: 'https://www.checkout-ds24.com/product/737209/',
       thankYouUrl: 'https://www.plancreateur.online/obrigado/?step=up1',
-      noUrl: 'https://www.plancreateur.online/app/up2/',
+      noUrl: 'https://www.plancreateur.online/app/up3/',
       integrationScript: ''
     },
     up2: {

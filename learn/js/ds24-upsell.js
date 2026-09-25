@@ -2,7 +2,8 @@
   "use strict";
 
   var cfg = window.LEARN_CONFIG || { ds24: {}, pages: {} };
-  var nextByStep = { up1: cfg.pages.up2, up2: cfg.pages.up3, up3: cfg.pages.final };
+  // UP2 fora do funil DS24 — após UP1 vai direto pro UP3
+  var nextByStep = { up1: cfg.pages.up3, up2: cfg.pages.up3, up3: cfg.pages.final };
 
   function appendTracking(base) {
     if (!base) return base;
