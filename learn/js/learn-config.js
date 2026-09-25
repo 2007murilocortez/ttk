@@ -30,9 +30,9 @@ window.LEARN_CONFIG = {
    *
    * UP1 (~€19,90)
    *   Thank you URL: https://www.plancreateur.online/obrigado/?step=up1
-   *   DS24/revisão → /app/up3/ | funil black → /learn/up3.2/ (UP2 pausado)
+   *   DS24/revisão → /app/up2/ | funil black → /learn/up2.2/
    *
-   * UP2 (~€25,58) — fora do funil até reaprovação DS24
+   * UP2 (~€25,58) — obrigado/?step=up2 → /app/up3/ ou /learn/up3.2/
    * UP3 (~€33,77) — obrigado/?step=up3 → /app/merci/ ou /learn/final/
    * (black detectado via sessionStorage ttk:funnel=learn ou ttk:ds24_pending)
    */
