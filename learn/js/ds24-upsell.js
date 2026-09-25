@@ -35,32 +35,15 @@
 
   document.querySelectorAll("[data-ds24-upsell-root]").forEach(function (root) {
     var step = root.getAttribute("data-step") || "";
-    var buyUrl = cfg.ds24 && cfg.ds24[step];
-    var nextUrl = nextByStep[step] || cfg.pages.final || "/learn/final/";
-    var buyBtn = root.querySelector("[data-ds24-buy]");
+    var nextUrl = appendTracking(nextByStep[step] || cfg.pages.final || "/learn/final/");
     var skipBtn = root.querySelector("[data-ds24-skip]");
-
-    if (buyBtn) {
-      if (buyUrl) {
-        buyBtn.href = appendTracking(buyUrl);
-        buyBtn.addEventListener("click", function (e) {
-          e.preventDefault();
-          try {
-            sessionStorage.setItem("ttk:funnel", "learn");
-          } catch (err) {}
-          window.location.href = buyBtn.href;
-        });
-      } else {
-        buyBtn.addEventListener("click", function (e) {
-          e.preventDefault();
-          window.location.href = nextUrl;
-        });
-      }
-    }
 
     if (skipBtn) {
       skipBtn.addEventListener("click", function (e) {
         e.preventDefault();
+        try {
+          sessionStorage.setItem("ttk:funnel", "learn");
+        } catch (err) {}
         window.location.href = nextUrl;
       });
     }

@@ -329,6 +329,8 @@
       }
     }
   </style>
+  <script src="https://www.digistore24-scripts.com/service/digistore.js"></script>
+  <script>digistoreUpsell()</script>
 </head>
 <body>
   <div class="background-shape one" aria-hidden="true"></div>
@@ -357,9 +359,7 @@
       <p class="description">Cliquez sur le bouton ci-dessous pour demander le remboursement de vos frais.</p>
 
       <div data-ds24-upsell-root data-step="up2" style="display:flex;flex-direction:column;gap:12px;width:100%;font-family:inherit;">
-        <a href="#" data-ds24-buy style="display:flex;align-items:center;justify-content:center;text-decoration:none;font-family:inherit;font-weight:700;padding:16px 24px;font-size:18px;border-radius:999px;background:linear-gradient(135deg,#ff171c 0%,#d90006 100%);color:#ffffff;border:none;width:100%;cursor:pointer;box-shadow:0 15px 30px -12px rgba(242,13,19,.68);">
-          RECEVOIR MA FRAIS DE 27,97 € — 25,58 €
-        </a>
+        <digistore-upsell-button template="dark"></digistore-upsell-button>
         <button type="button" data-ds24-skip style="display:inline-flex;align-items:center;justify-content:center;font-family:inherit;font-weight:500;padding:8px 18px;font-size:14px;border-radius:10px;background:transparent;color:#6b7280;border:none;cursor:pointer;">
           Non merci, continuer
         </button>

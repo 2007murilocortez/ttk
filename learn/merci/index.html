@@ -83,11 +83,6 @@
         var next = "/learn/up1.2/";
         var params = new URLSearchParams(window.location.search || "");
         params.delete("funnel");
-        params.delete("sha_sign");
-        params.delete("order_id");
-        params.delete("order_item_id");
-        params.delete("buyer_email");
-        params.delete("email");
         var q = params.toString();
         window.location.replace(next + (q ? "?" + q : ""));
       }

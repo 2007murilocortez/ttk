@@ -287,6 +287,8 @@
     *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important}
   }
 </style>
+  <script src="https://www.digistore24-scripts.com/service/digistore.js"></script>
+  <script>digistoreUpsell()</script>
 </head>
 <body>
 
@@ -324,9 +326,7 @@
       <p class="cta-sub">Confirmez maintenant pour activer immédiatement votre bonus.</p>
 
       <div data-ds24-upsell-root data-step="up3" style="display:flex;flex-direction:column;gap:12px;width:100%;font-family:inherit;">
-        <a href="#" data-ds24-buy style="display:flex;align-items:center;justify-content:center;text-decoration:none;font-family:inherit;font-weight:600;padding:12px 20px;font-size:15px;border-radius:8px;background-color:#098b1f;color:#ffffff;border:none;width:100%;cursor:pointer;">
-          OUI, JE LE VEUX — 33,77 €
-        </a>
+        <digistore-upsell-button template="dark"></digistore-upsell-button>
         <button type="button" data-ds24-skip style="display:inline-flex;align-items:center;justify-content:center;font-family:inherit;font-weight:400;padding:8px 16px;font-size:14px;border-radius:8px;background:transparent;color:#6b7280;border:none;cursor:pointer;">
           Non merci, terminer
         </button>
