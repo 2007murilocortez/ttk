@@ -32,6 +32,13 @@ const REPLACEMENTS = [
   ['l?"100.00":"101.43"', 'l?"50.00":"101.43"'],
   ['l="/pv11"===n', 'l="/pv11"===n||"/pv11/"===n'],
   ['r="/pv11/vsl"===n', 'r="/pv11/vsl"===n||"/pv11/vsl/"===n'],
+  // Header com o pill $ é um <Link href="/pv11/vsl">. A condição original
+  // esconde esse header nas rotas do funil, mas só compara path sem barra.
+  // Com trailingSlash o pathname é /pv11/ e o pill aparece na presell.
+  [
+    '!("/pv11"===n||"/pv11/trading"===n||"/pv11/withdraw"===n||"/pv11/withdraw/processing"===n||"/pv11/vsl"===n)',
+    '!(n==null||"/pv11"===n||"/pv11/"===n||"/pv11/trading"===n||"/pv11/trading/"===n||"/pv11/withdraw"===n||"/pv11/withdraw/"===n||"/pv11/withdraw/processing"===n||"/pv11/withdraw/processing/"===n||"/pv11/vsl"===n||"/pv11/vsl/"===n)',
+  ],
   // Sem pathname ainda (hidratação), fica 50 — não pisca para 101,43.
   ['children:l?"50.00":"101.43"', 'children:n&&!l?"101.43":"50.00"'],
   // Card da presell: fallback era 100 e o contexto entrega 50.
@@ -39,6 +46,16 @@ const REPLACEMENTS = [
   [">US$100.00<", ">US$50.00<"],
   ['leading-none">100</span>', 'leading-none">50</span>'],
 ];
+
+function collapseDuplicateOrs(text) {
+  const parts = ['||"/pv11/"===n', '||"/pv11/vsl/"===n'];
+  let next = text;
+  for (const part of parts) {
+    const pair = part + part;
+    while (next.includes(pair)) next = next.split(pair).join(part);
+  }
+  return next;
+}
 
 function walk(dir, acc = []) {
   for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -56,10 +73,15 @@ for (const file of walk(SITE)) {
   let text = fs.readFileSync(file, "utf8");
   let changed = false;
   for (const [from, to] of REPLACEMENTS) {
-    if (!text.includes(from)) continue;
+    if (text.includes(to) || !text.includes(from)) continue;
     const n = text.split(from).length - 1;
     text = text.split(from).join(to);
     totalSubs += n;
+    changed = true;
+  }
+  const collapsed = collapseDuplicateOrs(text);
+  if (collapsed !== text) {
+    text = collapsed;
     changed = true;
   }
   if (changed) {
