@@ -2,8 +2,8 @@ const fs = require("fs");
 const path = require("path");
 
 const { siteRoot } = require("./paths");
-/** Runs before Next — blocks soft navigation on static export. */
-const headTag = '<script src="/static-nav.js"></script>';
+/** Clique em links internos vira carga completa. Não mexe em history (isso recarregava a página em loop). */
+const headTag = '<script src="/static-nav.js?v=4"></script>';
 
 function walk(dir) {
   for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -15,8 +15,8 @@ function walk(dir) {
         /<script src="[^"]*static-nav\.js" defer><\/script>/g,
         ""
       );
-      html = html.replace(/<script src="[^"]*static-nav\.js"><\/script>/g, "");
-      if (html.includes('src="/static-nav.js"')) continue;
+      html = html.replace(/<script src="[^"]*static-nav\.js[^"]*"><\/script>/g, "");
+      if (html.includes("static-nav.js?v=4")) continue;
       if (html.includes("<head>")) {
         html = html.replace("<head>", "<head>" + headTag);
       } else {
