@@ -1,5 +1,5 @@
 /**
- * Sincroniza funil/site → clone do repo de deploy (ex.: ../ttk-git/site).
+ * Sincroniza funil/site → raiz do repo de deploy (Vercel publica a raiz, não site/).
  * Uso: node scripts/sync-deploy-repo.js [caminho-do-repo]
  */
 const fs = require("fs");
@@ -9,29 +9,15 @@ const { siteRoot } = require("./paths");
 const repoRoot = path.resolve(
   process.argv[2] || path.join(__dirname, "..", "..", "ttk-git")
 );
-const destSite = path.join(repoRoot, "site");
 
-/** Entradas antigas na raiz do repo (deploy flat); removidas após migrar para site/. */
-const LEGACY_REPO_ROOT = new Set([
-  "_next",
-  "pv11",
-  "back",
-  "presell",
-  "audios",
-  "favicon.ico",
-  "serve.json",
-  "static-nav.js",
-  "vercel.json",
-  "Mulher 01.jpg",
-  "Mulher 02.jpg",
-  "Mulher 03.jpg",
-  "Mulher 04.jpg",
-  "Mulher 05.jpg",
-  "perfil3.jpg",
-  "perfil4.jpg",
-  "perfil5.jpg",
-  "perfil6.jpg",
-  "perfil7.jpg",
+/** Não sobrescrever metadados do repo Git. */
+const REPO_KEEP = new Set([
+  ".git",
+  ".gitignore",
+  "scripts",
+  "package.json",
+  "README.md",
+  "node_modules",
 ]);
 
 function copyDir(src, dest) {
@@ -44,26 +30,31 @@ function copyDir(src, dest) {
   }
 }
 
+function rmIfExists(p) {
+  if (fs.existsSync(p)) fs.rmSync(p, { recursive: true, force: true });
+}
+
 if (!fs.existsSync(siteRoot)) {
   console.error("Site não encontrado:", siteRoot);
   process.exit(1);
 }
 
-for (const name of fs.readdirSync(repoRoot)) {
-  if (!LEGACY_REPO_ROOT.has(name)) continue;
-  const full = path.join(repoRoot, name);
-  fs.rmSync(full, { recursive: true, force: true });
-  console.log("Removido legado na raiz do repo:", name);
-}
+// Layout antigo (site/ no repo) quebrava deploy na Vercel sem Root Directory.
+rmIfExists(path.join(repoRoot, "site"));
 
-fs.mkdirSync(destSite, { recursive: true });
-copyDir(siteRoot, destSite);
+for (const ent of fs.readdirSync(siteRoot, { withFileTypes: true })) {
+  const from = path.join(siteRoot, ent.name);
+  const to = path.join(repoRoot, ent.name);
+  rmIfExists(to);
+  if (ent.isDirectory()) copyDir(from, to);
+  else fs.copyFileSync(from, to);
+}
 
 const vercelSrc = path.join(siteRoot, "vercel.json");
 if (!fs.existsSync(vercelSrc)) {
   const fallback = path.join(__dirname, "..", "..", "deploy-ttk", "vercel.json");
   if (fs.existsSync(fallback)) {
-    fs.copyFileSync(fallback, path.join(destSite, "vercel.json"));
+    fs.copyFileSync(fallback, path.join(repoRoot, "vercel.json"));
   }
 }
 
@@ -78,7 +69,20 @@ const scriptNames = [
 const scriptsDest = path.join(repoRoot, "scripts");
 fs.mkdirSync(scriptsDest, { recursive: true });
 for (const name of scriptNames) {
-  fs.copyFileSync(path.join(__dirname, name), path.join(scriptsDest, name));
+  if (name === "paths.js") {
+    const deployPaths = `const path = require("path");
+
+/** Raiz do repo = site publicado (Vercel). */
+const siteRoot = process.env.SITE_DIR
+  ? path.resolve(process.env.SITE_DIR)
+  : path.join(__dirname, "..");
+
+module.exports = { siteRoot };
+`;
+    fs.writeFileSync(path.join(scriptsDest, name), deployPaths);
+  } else {
+    fs.copyFileSync(path.join(__dirname, name), path.join(scriptsDest, name));
+  }
 }
 
 const pkg = {
@@ -96,16 +100,14 @@ fs.writeFileSync(
 
 const readme = `# ttk — funil estático
 
-Site publicado na pasta \`site/\`. Na Vercel: **Root Directory = site**.
+Arquivos do funil na **raiz** deste repo (deploy Vercel padrão, sem subpasta).
 
 ## Manutenção
 
-Edite em \`projeto-moneyclub/funil/\`, rode \`npm run deploy:sync\` e faça push deste repo.
+Edite em \`projeto-moneyclub/funil/\`, rode \`npm run deploy:sync\` e faça push.
 
-## Scripts (raiz)
-
-\`npm run fix\` — reaplica patches em \`site/\` (útil se clonar só este repo).
+\`npm run fix\` — reaplica patches nos arquivos da raiz.
 `;
 fs.writeFileSync(path.join(repoRoot, "README.md"), readme);
 
-console.log("Deploy sync:", siteRoot, "→", destSite);
+console.log("Deploy sync:", siteRoot, "→", repoRoot);

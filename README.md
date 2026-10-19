@@ -1,11 +1,9 @@
 # ttk — funil estático
 
-Site publicado na pasta `site/`. Na Vercel: **Root Directory = site**.
+Arquivos do funil na **raiz** deste repo (deploy Vercel padrão, sem subpasta).
 
 ## Manutenção
 
-Edite em `projeto-moneyclub/funil/`, rode `npm run deploy:sync` e faça push deste repo.
+Edite em `projeto-moneyclub/funil/`, rode `npm run deploy:sync` e faça push.
 
-## Scripts (raiz)
-
-`npm run fix` — reaplica patches em `site/` (útil se clonar só este repo).
+`npm run fix` — reaplica patches nos arquivos da raiz.
