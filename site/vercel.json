@@ -1,0 +1,27 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": false,
+  "trailingSlash": true,
+  "redirects": [
+    { "source": "/", "destination": "/pv11/", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/pv11", "destination": "/pv11/index.html" },
+    { "source": "/pv11/trading", "destination": "/pv11/trading/index.html" },
+    { "source": "/pv11/vsl", "destination": "/pv11/vsl/index.html" },
+    { "source": "/pv11/withdraw", "destination": "/pv11/withdraw/index.html" },
+    { "source": "/back", "destination": "/back/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ]
+}

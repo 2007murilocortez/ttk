@@ -39,24 +39,25 @@ if (!fs.existsSync(siteRoot)) {
   process.exit(1);
 }
 
-// Layout antigo (site/ no repo) quebrava deploy na Vercel sem Root Directory.
-rmIfExists(path.join(repoRoot, "site"));
-
-for (const ent of fs.readdirSync(siteRoot, { withFileTypes: true })) {
-  const from = path.join(siteRoot, ent.name);
-  const to = path.join(repoRoot, ent.name);
-  rmIfExists(to);
-  if (ent.isDirectory()) copyDir(from, to);
-  else fs.copyFileSync(from, to);
-}
-
-const vercelSrc = path.join(siteRoot, "vercel.json");
-if (!fs.existsSync(vercelSrc)) {
-  const fallback = path.join(__dirname, "..", "..", "deploy-ttk", "vercel.json");
-  if (fs.existsSync(fallback)) {
-    fs.copyFileSync(fallback, path.join(repoRoot, "vercel.json"));
+function publishSiteTo(destRoot) {
+  for (const ent of fs.readdirSync(siteRoot, { withFileTypes: true })) {
+    const from = path.join(siteRoot, ent.name);
+    const to = path.join(destRoot, ent.name);
+    rmIfExists(to);
+    if (ent.isDirectory()) copyDir(from, to);
+    else fs.copyFileSync(from, to);
+  }
+  const vercelSrc = path.join(siteRoot, "vercel.json");
+  if (fs.existsSync(vercelSrc)) {
+    fs.copyFileSync(vercelSrc, path.join(destRoot, "vercel.json"));
   }
 }
+
+// Raiz (padrão Vercel) + site/ (se Root Directory = site no painel).
+publishSiteTo(repoRoot);
+const nested = path.join(repoRoot, "site");
+rmIfExists(nested);
+publishSiteTo(nested);
 
 const scriptNames = [
   "paths.js",
@@ -100,7 +101,7 @@ fs.writeFileSync(
 
 const readme = `# ttk — funil estático
 
-Arquivos do funil na **raiz** deste repo (deploy Vercel padrão, sem subpasta).
+Arquivos do funil na **raiz** e cópia em \`site/\` (funciona com ou sem Root Directory na Vercel).
 
 ## Manutenção
 

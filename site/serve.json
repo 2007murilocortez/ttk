@@ -1,0 +1,11 @@
+{
+  "cleanUrls": false,
+  "trailingSlash": true,
+  "rewrites": [
+    { "source": "/pv11", "destination": "/pv11/index.html" },
+    { "source": "/pv11/trading", "destination": "/pv11/trading/index.html" },
+    { "source": "/pv11/vsl", "destination": "/pv11/vsl/index.html" },
+    { "source": "/pv11/withdraw", "destination": "/pv11/withdraw/index.html" },
+    { "source": "/back", "destination": "/back/index.html" }
+  ]
+}

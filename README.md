@@ -1,6 +1,6 @@
 # ttk — funil estático
 
-Arquivos do funil na **raiz** deste repo (deploy Vercel padrão, sem subpasta).
+Arquivos do funil na **raiz** e cópia em `site/` (funciona com ou sem Root Directory na Vercel).
 
 ## Manutenção
 
