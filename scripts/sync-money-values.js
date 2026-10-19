@@ -32,6 +32,12 @@ const REPLACEMENTS = [
   ['l?"100.00":"101.43"', 'l?"50.00":"101.43"'],
   ['l="/pv11"===n', 'l="/pv11"===n||"/pv11/"===n'],
   ['r="/pv11/vsl"===n', 'r="/pv11/vsl"===n||"/pv11/vsl/"===n'],
+  // Sem pathname ainda (hidratação), fica 50 — não pisca para 101,43.
+  ['children:l?"50.00":"101.43"', 'children:n&&!l?"101.43":"50.00"'],
+  // Card da presell: fallback era 100 e o contexto entrega 50.
+  ["initialBalance)&&void 0!==t?t:100", "initialBalance)&&void 0!==t?t:50"],
+  [">US$100.00<", ">US$50.00<"],
+  ['leading-none">100</span>', 'leading-none">50</span>'],
 ];
 
 function walk(dir, acc = []) {

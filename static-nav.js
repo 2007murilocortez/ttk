@@ -1,6 +1,32 @@
 (function () {
   var FUNNEL = /^\/(pv11|back)(\/|$)/;
 
+  function norm(path) {
+    if (!path) return "/";
+    var p = path.split("?")[0].split("#")[0];
+    if (p.length > 1 && p.charAt(p.length - 1) === "/") p = p.slice(0, -1);
+    return p || "/";
+  }
+
+  function pathOf(url) {
+    if (!url || typeof url !== "string") return "";
+    try {
+      if (url.charAt(0) === "/") return norm(url);
+      return norm(new URL(url, window.location.origin).pathname);
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function currentPath() {
+    return norm(window.location.pathname);
+  }
+
+  function isFunnelPath(url) {
+    var path = pathOf(url);
+    return !!path && FUNNEL.test(path + "/");
+  }
+
   function withQuery(path) {
     if (!path || path.indexOf("?") >= 0) return path;
     var q = window.location.search;
@@ -8,42 +34,26 @@
   }
 
   function fullNavigate(url) {
-    if (!url || typeof url !== "string") return;
+    var next = pathOf(url);
+    if (!next || next === currentPath()) return;
     if (url.charAt(0) === "/") {
-      window.location.href = withQuery(url);
+      window.location.href = withQuery(url.split("#")[0]);
       return;
     }
-    try {
-      var u = new URL(url, window.location.origin);
-      if (FUNNEL.test(u.pathname)) {
-        window.location.href = withQuery(u.pathname) + u.hash;
-        return;
-      }
-    } catch (e) {}
-    window.location.assign(url);
-  }
-
-  function isFunnelPath(url) {
-    if (!url || typeof url !== "string") return false;
-    try {
-      var path = url.charAt(0) === "/" ? url.split("?")[0] : new URL(url, window.location.origin).pathname;
-      return FUNNEL.test(path);
-    } catch (e) {
-      return false;
-    }
+    window.location.href = withQuery(next);
   }
 
   var pushState = history.pushState;
   var replaceState = history.replaceState;
-  history.pushState = function (_state, _title, url) {
-    if (isFunnelPath(url)) {
+  history.pushState = function (state, title, url) {
+    if (url && isFunnelPath(url) && pathOf(url) !== currentPath()) {
       fullNavigate(url);
       return;
     }
     return pushState.apply(this, arguments);
   };
-  history.replaceState = function (_state, _title, url) {
-    if (isFunnelPath(url)) {
+  history.replaceState = function (state, title, url) {
+    if (url && isFunnelPath(url) && pathOf(url) !== currentPath()) {
       fullNavigate(url);
       return;
     }
@@ -57,32 +67,11 @@
       if (!a || a.target === "_blank" || a.hasAttribute("download")) return;
       var href = a.getAttribute("href");
       if (!href || href.charAt(0) !== "/" || href.indexOf("/_next/") === 0) return;
-      if (!isFunnelPath(href)) return;
+      if (!isFunnelPath(href) || pathOf(href) === currentPath()) return;
       e.preventDefault();
       e.stopImmediatePropagation();
       fullNavigate(href);
     },
     true
   );
-
-  var nativeFetch = window.fetch;
-  if (nativeFetch) {
-    window.fetch = function (input, init) {
-      var url = typeof input === "string" ? input : input && input.url;
-      var headers = init && init.headers;
-      var rsc = false;
-      if (headers) {
-        if (typeof headers.get === "function") {
-          rsc = headers.get("RSC") === "1" || headers.get("Next-Router-State-Tree");
-        } else {
-          rsc = headers.RSC === "1" || headers["Next-Router-State-Tree"];
-        }
-      }
-      if (rsc && url && isFunnelPath(url)) {
-        fullNavigate(url);
-        return Promise.reject(new Error("static-export"));
-      }
-      return nativeFetch.apply(this, arguments);
-    };
-  }
 })();
