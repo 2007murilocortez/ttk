@@ -26,6 +26,12 @@ const REPLACEMENTS = [
   // HTML estático / RSC export (se presente)
   ["6a978120b173bb92f8fef13f", "6ad67d19e83e4f336e01c906"],
   ["ab-6a978120b173bb92f8fef13f", "vid-6ad67d19e83e4f336e01c906"],
+  // O replace do id antigo roda antes e deixa o prefixo ab- no HTML.
+  ["ab-6ad67d19e83e4f336e01c906", "vid-6ad67d19e83e4f336e01c906"],
+  [
+    '<vturb-smartplayer id="vid-6ad67d19e83e4f336e01c906" style="display:block;margin:0 auto;width:100%"></vturb-smartplayer>',
+    '<vturb-smartplayer id="vid-6ad67d19e83e4f336e01c906" style="display:block;margin:0 auto;width:100%"><div class="vturb-player-placeholder" style="position:relative;width:100%;padding:56.25% 0 0;z-index:0;background-color:black"></div></vturb-smartplayer>',
+  ],
   [
     "1af34d35-3e7b-4734-8f04-d5ead575fea0/ab-test/6a978120b173bb92f8fef13f",
     "50ef5c18-6787-4abc-bbce-c80337f7015d/players/6ad67d19e83e4f336e01c906/v4",
