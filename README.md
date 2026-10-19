@@ -1,8 +1,11 @@
-# Money Club funnel (pv11)
+# ttk — funil estático
 
-Site estático exportado do funil **growaiclub** — presell, trading, VSL, withdraw e back.
+Site publicado na pasta `site/`. Na Vercel: **Root Directory = site**.
 
-- Entrada: `/pv11/` (raiz redireciona para aqui)
-- Deploy: [Vercel](https://vercel.com) (branch `main`)
+## Manutenção
 
-Manutenção local dos patches: pasta `funil/` no projeto Money Club (`npm run fix` antes de copiar `growaiclub.com` para este repo).
+Edite em `projeto-moneyclub/funil/`, rode `npm run deploy:sync` e faça push deste repo.
+
+## Scripts (raiz)
+
+`npm run fix` — reaplica patches em `site/` (útil se clonar só este repo).
