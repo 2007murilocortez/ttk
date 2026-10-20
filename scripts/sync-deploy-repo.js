@@ -67,6 +67,7 @@ const scriptNames = [
   "sync-vsl-embed.js",
   "sync-deploy-repo.js",
   "inject-utmify.js",
+  "inject-tiktok.js",
 ];
 const scriptsDest = path.join(repoRoot, "scripts");
 fs.mkdirSync(scriptsDest, { recursive: true });
@@ -91,7 +92,7 @@ const pkg = {
   name: "moneyclub-funnel-deploy",
   private: true,
   scripts: {
-    fix: "node scripts/fix-static-next.js && node scripts/sync-money-values.js && node scripts/sync-vsl-embed.js && node scripts/inject-static-nav.js && node scripts/inject-utmify.js",
+    fix: "node scripts/fix-static-next.js && node scripts/sync-money-values.js && node scripts/sync-vsl-embed.js && node scripts/inject-static-nav.js && node scripts/inject-utmify.js && node scripts/inject-tiktok.js",
     sync: "node scripts/sync-deploy-repo.js",
   },
 };
