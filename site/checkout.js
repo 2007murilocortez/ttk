@@ -89,8 +89,8 @@
       "#lead-gate button[type=submit]:active{transform:translateY(1px)}" +
       "#lead-gate .lead-close{position:absolute;top:8px;right:8px;width:32px;height:32px;border:0;border-radius:999px;background:transparent;color:#94a3b8;font-size:22px;line-height:1;cursor:pointer}" +
       "#vsl-cta{position:absolute;z-index:30;margin:0;box-sizing:border-box}" +
-      "#vsl-cta[hidden]{display:none!important}" +
-      "vturb-smartplayer{margin-bottom:112px !important}" +
+      "#vsl-cta.esconder,#vsl-cta.hidden{display:none}" +
+      "vturb-smartplayer.cta-open{margin-bottom:112px !important}" +
       "#vsl-cta button{width:100%;border:0;border-radius:14px;padding:15px 16px;background:#16a34a;color:#fff;font-size:16px;font-weight:800;letter-spacing:.02em;cursor:pointer;box-shadow:0 10px 24px rgba(22,163,74,.35)}" +
       "#vsl-cta p{margin:8px 0 0;text-align:center;color:#94a3b8;font-size:12px}";
     document.head.appendChild(style);
@@ -224,41 +224,93 @@
     true
   );
 
+  function findVideo(root) {
+    var stack = [root];
+    var seen = [];
+    while (stack.length) {
+      var node = stack.pop();
+      if (!node || seen.indexOf(node) !== -1) continue;
+      seen.push(node);
+      if (node.tagName === "VIDEO") return node;
+      if (node.shadowRoot) stack.push(node.shadowRoot);
+      var kids = node.querySelectorAll ? node.querySelectorAll("*") : [];
+      for (var i = 0; i < kids.length; i++) {
+        if (kids[i].shadowRoot) stack.push(kids[i].shadowRoot);
+        if (kids[i].tagName === "VIDEO") return kids[i];
+      }
+    }
+    return null;
+  }
+
   function mountVslCta() {
     if (!/\/pv11\/vsl\/?$/i.test(window.location.pathname)) return;
     whenReady(function () {
-      if (document.getElementById("vsl-cta")) return;
       css();
-      var wrap = document.createElement("div");
-      wrap.id = "vsl-cta";
-      wrap.hidden = true;
-      wrap.innerHTML =
-        '<button type="button">GET ACCESS · US$29.90</button>' +
-        "<p>One-time · secure checkout</p>";
-      document.body.appendChild(wrap);
-      wrap.querySelector("button").addEventListener("click", function () {
-        showForm(CHECKOUT);
+      var wrap = document.getElementById("vsl-cta");
+      if (!wrap) {
+        wrap = document.createElement("div");
+        wrap.id = "vsl-cta";
+        wrap.className = "esconder hidden delay";
+        wrap.innerHTML =
+          '<button type="button">GET ACCESS · US$29.90</button>' +
+          "<p>One-time · secure checkout</p>";
+        document.body.appendChild(wrap);
+      }
+      var button = wrap.querySelector("button");
+      if (button && !button.getAttribute("data-bound")) {
+        button.setAttribute("data-bound", "1");
+        button.addEventListener("click", function () {
+          showForm(CHECKOUT);
+        });
+      }
+
+      var PITCH = 1183;
+      function arm(player) {
+        if (!player || player.getAttribute("data-cta-armed") === "1") return;
+        if (typeof player.displayHiddenElements !== "function") return;
+        player.setAttribute("data-cta-armed", "1");
+        try {
+          player.displayHiddenElements(PITCH, ["#vsl-cta", ".esconder"], { persist: true });
+        } catch (e) {
+          player.removeAttribute("data-cta-armed");
+        }
+      }
+
+      document.addEventListener("player:ready", function (event) {
+        var detail = event.detail || {};
+        arm(detail.player || document.querySelector("vturb-smartplayer"));
       });
-      function place() {
-        var player = document.querySelector("vturb-smartplayer");
-        if (!player) {
-          wrap.hidden = true;
-          return;
-        }
+
+      function place(player) {
+        if (!player) return;
         var rect = player.getBoundingClientRect();
-        if (rect.width < 8 || rect.height < 8) {
-          wrap.hidden = true;
-          return;
-        }
-        wrap.hidden = false;
+        if (rect.width < 8) return;
+        player.classList.add("cta-open");
         wrap.style.left = rect.left + window.scrollX + "px";
         wrap.style.top = rect.bottom + window.scrollY + 14 + "px";
         wrap.style.width = rect.width + "px";
       }
-      place();
-      window.addEventListener("scroll", place, true);
-      window.addEventListener("resize", place);
-      window.setInterval(place, 400);
+
+      function tick() {
+        var player = document.querySelector("vturb-smartplayer");
+        if (player) arm(player);
+        var shown = window.getComputedStyle(wrap).display !== "none";
+        if (!shown && player) {
+          var video = findVideo(player);
+          if (video && video.currentTime + 0.2 >= PITCH) {
+            wrap.classList.remove("esconder", "hidden", "delay");
+            wrap.style.display = "block";
+            shown = true;
+          }
+        }
+        if (shown) place(player);
+        else if (player) player.classList.remove("cta-open");
+      }
+
+      tick();
+      window.addEventListener("scroll", tick, true);
+      window.addEventListener("resize", tick);
+      window.setInterval(tick, 400);
     });
   }
 
