@@ -3,14 +3,26 @@
   "cleanUrls": false,
   "trailingSlash": true,
   "redirects": [
-    { "source": "/", "destination": "/pv11/", "permanent": false }
+    {
+      "source": "/",
+      "has": [{ "type": "query", "key": "to" }],
+      "destination": "/checkout/",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "missing": [{ "type": "query", "key": "to" }],
+      "destination": "/pv11/",
+      "permanent": false
+    }
   ],
   "rewrites": [
     { "source": "/pv11", "destination": "/pv11/index.html" },
     { "source": "/pv11/trading", "destination": "/pv11/trading/index.html" },
     { "source": "/pv11/vsl", "destination": "/pv11/vsl/index.html" },
     { "source": "/pv11/withdraw", "destination": "/pv11/withdraw/index.html" },
-    { "source": "/back", "destination": "/back/index.html" }
+    { "source": "/back", "destination": "/back/index.html" },
+    { "source": "/checkout", "destination": "/checkout/index.html" }
   ],
   "headers": [
     {
