@@ -88,7 +88,9 @@
       "#lead-gate button[type=submit]{width:100%;border:0;border-radius:12px;padding:13px 16px;background:#16a34a;color:#fff;font-size:16px;font-weight:700;cursor:pointer}" +
       "#lead-gate button[type=submit]:active{transform:translateY(1px)}" +
       "#lead-gate .lead-close{position:absolute;top:8px;right:8px;width:32px;height:32px;border:0;border-radius:999px;background:transparent;color:#94a3b8;font-size:22px;line-height:1;cursor:pointer}" +
-      "#vsl-cta{margin-top:14px}" +
+      "#vsl-cta{position:absolute;z-index:30;margin:0;box-sizing:border-box}" +
+      "#vsl-cta[hidden]{display:none!important}" +
+      "vturb-smartplayer{margin-bottom:112px !important}" +
       "#vsl-cta button{width:100%;border:0;border-radius:14px;padding:15px 16px;background:#16a34a;color:#fff;font-size:16px;font-weight:800;letter-spacing:.02em;cursor:pointer;box-shadow:0 10px 24px rgba(22,163,74,.35)}" +
       "#vsl-cta p{margin:8px 0 0;text-align:center;color:#94a3b8;font-size:12px}";
     document.head.appendChild(style);
@@ -225,23 +227,38 @@
   function mountVslCta() {
     if (!/\/pv11\/vsl\/?$/i.test(window.location.pathname)) return;
     whenReady(function () {
-      var tries = 0;
-      var timer = window.setInterval(function () {
+      if (document.getElementById("vsl-cta")) return;
+      css();
+      var wrap = document.createElement("div");
+      wrap.id = "vsl-cta";
+      wrap.hidden = true;
+      wrap.innerHTML =
+        '<button type="button">GET ACCESS · US$29.90</button>' +
+        "<p>One-time · secure checkout</p>";
+      document.body.appendChild(wrap);
+      wrap.querySelector("button").addEventListener("click", function () {
+        showForm(CHECKOUT);
+      });
+      function place() {
         var player = document.querySelector("vturb-smartplayer");
-        if (!player && tries++ < 40) return;
-        window.clearInterval(timer);
-        if (!player || document.getElementById("vsl-cta")) return;
-        css();
-        var wrap = document.createElement("div");
-        wrap.id = "vsl-cta";
-        wrap.innerHTML =
-          '<button type="button">GET ACCESS · US$29.90</button>' +
-          "<p>One-time · secure checkout</p>";
-        player.insertAdjacentElement("afterend", wrap);
-        wrap.querySelector("button").addEventListener("click", function () {
-          showForm(CHECKOUT);
-        });
-      }, 250);
+        if (!player) {
+          wrap.hidden = true;
+          return;
+        }
+        var rect = player.getBoundingClientRect();
+        if (rect.width < 8 || rect.height < 8) {
+          wrap.hidden = true;
+          return;
+        }
+        wrap.hidden = false;
+        wrap.style.left = rect.left + window.scrollX + "px";
+        wrap.style.top = rect.bottom + window.scrollY + 14 + "px";
+        wrap.style.width = rect.width + "px";
+      }
+      place();
+      window.addEventListener("scroll", place, true);
+      window.addEventListener("resize", place);
+      window.setInterval(place, 400);
     });
   }
 

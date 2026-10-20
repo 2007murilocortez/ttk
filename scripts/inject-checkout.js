@@ -5,7 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const { siteRoot } = require("./paths");
 
-const TAG = '<script src="/checkout.js?v=3"></script>';
+const TAG = '<script src="/checkout.js?v=4"></script>';
 
 function walk(dir) {
   for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -13,7 +13,7 @@ function walk(dir) {
     if (ent.isDirectory()) walk(full);
     else if (ent.name === "index.html") {
       let html = fs.readFileSync(full, "utf8");
-      if (html.includes('src="/checkout.js?v=3"') || !html.includes("<head>")) continue;
+      if (html.includes('src="/checkout.js?v=4"') || !html.includes("<head>")) continue;
       html = html.replace(/<script src="\/checkout\.js(?:\?[^"]*)?"><\/script>/g, "");
       html = html.replace("<head>", "<head>" + TAG);
       fs.writeFileSync(full, html);
