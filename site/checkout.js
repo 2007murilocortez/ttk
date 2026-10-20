@@ -87,7 +87,10 @@
       "#lead-gate .lead-error{min-height:18px;margin:0 0 8px;color:#fca5a5;font-size:13px}" +
       "#lead-gate button[type=submit]{width:100%;border:0;border-radius:12px;padding:13px 16px;background:#16a34a;color:#fff;font-size:16px;font-weight:700;cursor:pointer}" +
       "#lead-gate button[type=submit]:active{transform:translateY(1px)}" +
-      "#lead-gate .lead-close{position:absolute;top:8px;right:8px;width:32px;height:32px;border:0;border-radius:999px;background:transparent;color:#94a3b8;font-size:22px;line-height:1;cursor:pointer}";
+      "#lead-gate .lead-close{position:absolute;top:8px;right:8px;width:32px;height:32px;border:0;border-radius:999px;background:transparent;color:#94a3b8;font-size:22px;line-height:1;cursor:pointer}" +
+      "#vsl-cta{margin-top:14px}" +
+      "#vsl-cta button{width:100%;border:0;border-radius:14px;padding:15px 16px;background:#16a34a;color:#fff;font-size:16px;font-weight:800;letter-spacing:.02em;cursor:pointer;box-shadow:0 10px 24px rgba(22,163,74,.35)}" +
+      "#vsl-cta p{margin:8px 0 0;text-align:center;color:#94a3b8;font-size:12px}";
     document.head.appendChild(style);
   }
 
@@ -218,6 +221,31 @@
     },
     true
   );
+
+  function mountVslCta() {
+    if (!/\/pv11\/vsl\/?$/i.test(window.location.pathname)) return;
+    whenReady(function () {
+      var tries = 0;
+      var timer = window.setInterval(function () {
+        var player = document.querySelector("vturb-smartplayer");
+        if (!player && tries++ < 40) return;
+        window.clearInterval(timer);
+        if (!player || document.getElementById("vsl-cta")) return;
+        css();
+        var wrap = document.createElement("div");
+        wrap.id = "vsl-cta";
+        wrap.innerHTML =
+          '<button type="button">GET ACCESS · US$29.90</button>' +
+          "<p>One-time · secure checkout</p>";
+        player.insertAdjacentElement("afterend", wrap);
+        wrap.querySelector("button").addEventListener("click", function () {
+          showForm(CHECKOUT);
+        });
+      }, 250);
+    });
+  }
+
+  mountVslCta();
 
   var to = new URLSearchParams(window.location.search).get("to");
   if (to && allowed(to)) {
